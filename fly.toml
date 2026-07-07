@@ -1,0 +1,48 @@
+# Fly.io configuration for EasyNote.
+#
+# First deploy:
+#   fly launch --copy-config --no-deploy    # creates the app, pick a name/region
+#   fly volumes create easynote_data --size 1
+#   fly secrets set ANTHROPIC_API_KEY=sk-ant-...
+#   fly deploy
+#
+# The app name below is a placeholder — `fly launch` will rewrite it.
+
+app = "easynote"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "3000"
+  DATA_DIR = "/data"
+
+[mounts]
+  source = "easynote_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  # Keep one machine warm so background note processing is never interrupted
+  # mid-job by a scale-to-zero stop. Set to 0 to trade that for lower cost.
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+[[http_service.checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "15s"
+  method = "GET"
+  path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

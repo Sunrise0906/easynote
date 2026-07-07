@@ -1,0 +1,23 @@
+# Render.com blueprint for EasyNote.
+# In the Render dashboard: New → Blueprint → point at this repo.
+# NOTE: persistent disks require a paid instance type on Render.
+
+services:
+  - type: web
+    name: easynote
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    disk:
+      name: easynote-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: APP_URL
+        sync: false

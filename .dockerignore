@@ -1,0 +1,16 @@
+node_modules
+.next
+out
+data
+.env
+.env.local
+.git
+.claude
+*.log
+.DS_Store
+README.md
+Dockerfile
+docker-compose.yml
+fly.toml
+render.yaml
+.github

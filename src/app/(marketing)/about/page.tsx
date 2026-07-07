@@ -1,0 +1,94 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { GraduationCap, Heart, ShieldCheck, Zap } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About",
+  description: "Why we built EasyNote.",
+};
+
+const VALUES = [
+  {
+    icon: GraduationCap,
+    title: "Learning first",
+    desc: "Every feature exists to deepen understanding — not to replace it. Notes, quizzes and chat are scaffolding for real mastery.",
+  },
+  {
+    icon: Zap,
+    title: "Effort where it matters",
+    desc: "Transcribing and reformatting are robot work. We automate the mechanical so you can spend attention on thinking.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Your content is yours",
+    desc: "Notes stay private by default, exports are one click away, and nothing is shared unless you create a link.",
+  },
+  {
+    icon: Heart,
+    title: "Honest tools",
+    desc: "AI output is always grounded in your source and linked back to it, so you can verify anything instantly.",
+  },
+];
+
+export default function AboutPage() {
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
+      <h1 className="text-center text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+        We take the notes.
+        <br />
+        You do the thinking.
+      </h1>
+      <div className="mx-auto mt-8 max-w-2xl space-y-4 text-[15px] leading-7 text-slate-600">
+        <p>
+          EasyNote started with a familiar frustration: after a ninety-minute
+          lecture, the choice was between three pages of half-legible scribbles
+          or two hours of re-watching the recording. Neither was learning —
+          both were bookkeeping.
+        </p>
+        <p>
+          So we built the assistant we wished we had: something that listens to
+          the lecture, reads the paper, watches the video — and hands back a
+          transcript you can search, notes you can trust, flashcards that
+          actually test the right things, and a tutor that answers questions
+          from the material itself.
+        </p>
+        <p>
+          Today EasyNote helps students prepare for exams, professionals keep
+          up with meetings and webinars, and lifelong learners turn a YouTube
+          binge into something that sticks.
+        </p>
+      </div>
+
+      <div className="mt-14 grid gap-5 sm:grid-cols-2">
+        {VALUES.map((v) => (
+          <div
+            key={v.title}
+            className="rounded-2xl border border-slate-200 bg-white p-6"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+              <v.icon size={20} />
+            </div>
+            <div className="mt-3 font-bold text-slate-900">{v.title}</div>
+            <p className="mt-1.5 text-sm leading-6 text-slate-600">{v.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-14 rounded-3xl bg-brand-50 px-8 py-10 text-center">
+        <h2 className="text-2xl font-extrabold text-slate-900">
+          Learn something today
+        </h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+          Bring one lecture, one meeting or one video — see what it feels like
+          when the notes take themselves.
+        </p>
+        <Link
+          href="/login?mode=signup"
+          className="mt-6 inline-block rounded-xl bg-brand-600 px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-700"
+        >
+          Get started free
+        </Link>
+      </div>
+    </div>
+  );
+}

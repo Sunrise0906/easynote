@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #f4f1ff;
+  --color-brand-100: #ece5ff;
+  --color-brand-200: #dbceff;
+  --color-brand-300: #c0a7ff;
+  --color-brand-400: #a175ff;
+  --color-brand-500: #8546fb;
+  --color-brand-600: #7c22f3;
+  --color-brand-700: #6d15d8;
+  --color-brand-800: #5b13b1;
+  --color-brand-900: #4c1290;
+  --color-brand-950: #2e0662;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased;
+}
+
+::selection {
+  background: var(--color-brand-200);
+}
+
+/* Thin scrollbars for panels */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+/* Markdown prose styling (hand-rolled, no typography plugin) */
+.md-prose {
+  @apply text-[15px] leading-7 text-slate-700;
+}
+.md-prose h1 {
+  @apply mt-6 mb-3 text-2xl font-bold text-slate-900;
+}
+.md-prose h2 {
+  @apply mt-6 mb-2.5 text-xl font-bold text-slate-900;
+}
+.md-prose h3 {
+  @apply mt-5 mb-2 text-lg font-semibold text-slate-900;
+}
+.md-prose h4 {
+  @apply mt-4 mb-1.5 text-base font-semibold text-slate-900;
+}
+.md-prose p {
+  @apply my-2.5;
+}
+.md-prose ul {
+  @apply my-2.5 list-disc pl-6 space-y-1;
+}
+.md-prose ol {
+  @apply my-2.5 list-decimal pl-6 space-y-1;
+}
+.md-prose li > ul,
+.md-prose li > ol {
+  @apply my-1;
+}
+.md-prose blockquote {
+  @apply my-3 border-l-4 border-brand-300 bg-brand-50 px-4 py-2 rounded-r-lg text-slate-600;
+}
+.md-prose code {
+  @apply rounded bg-slate-100 px-1.5 py-0.5 text-[13px] font-mono text-brand-700;
+}
+.md-prose pre {
+  @apply my-3 overflow-x-auto rounded-xl bg-slate-900 p-4;
+}
+.md-prose pre code {
+  @apply bg-transparent p-0 text-slate-100;
+}
+.md-prose table {
+  @apply my-3 w-full border-collapse text-sm;
+}
+.md-prose th {
+  @apply border border-slate-200 bg-slate-50 px-3 py-2 text-left font-semibold;
+}
+.md-prose td {
+  @apply border border-slate-200 px-3 py-2 align-top;
+}
+.md-prose a {
+  @apply text-brand-600 underline underline-offset-2 hover:text-brand-700;
+}
+.md-prose hr {
+  @apply my-6 border-slate-200;
+}
+.md-prose strong {
+  @apply font-semibold text-slate-900;
+}
+
+/* Flashcard flip */
+.perspective-1000 {
+  perspective: 1200px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.5s ease both;
+}
+
+@keyframes pulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 18px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+.animate-pulse-ring {
+  animation: pulseRing 1.6s ease-out infinite;
+}
