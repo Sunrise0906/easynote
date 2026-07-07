@@ -46,26 +46,44 @@ export default function NoteCard({
 
   const rename = async () => {
     setBusy(true);
-    await apiPatch(`/api/notes/${note.id}`, { title });
-    setBusy(false);
-    setRenameOpen(false);
-    onChanged();
+    try {
+      await apiPatch(`/api/notes/${note.id}`, { title });
+      setRenameOpen(false);
+      onChanged();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Could not rename.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const move = async (folderId: string | null) => {
     setBusy(true);
-    await apiPatch(`/api/notes/${note.id}`, { folderId });
-    setBusy(false);
-    setMoveOpen(false);
-    onChanged();
+    try {
+      await apiPatch(`/api/notes/${note.id}`, { folderId });
+      setMoveOpen(false);
+      onChanged();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Could not move note.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const remove = async () => {
     setBusy(true);
-    await apiDelete(`/api/notes/${note.id}`);
-    setBusy(false);
-    setDeleteOpen(false);
-    onChanged();
+    try {
+      await apiDelete(`/api/notes/${note.id}`);
+      setDeleteOpen(false);
+      onChanged();
+    } catch (e) {
+      // A 404 means it's already gone — refresh the list rather than error.
+      setDeleteOpen(false);
+      onChanged();
+      void e;
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (

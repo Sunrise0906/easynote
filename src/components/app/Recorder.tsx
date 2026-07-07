@@ -47,7 +47,7 @@ const LANGS = [
   { code: "hi-IN", label: "हिन्दी" },
 ];
 
-type Phase = "idle" | "recording" | "paused" | "saving";
+type Phase = "idle" | "recording" | "paused" | "saving" | "saveFailed";
 
 export default function Recorder() {
   const router = useRouter();
@@ -74,6 +74,15 @@ export default function Recorder() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const rafRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  // Mirror of segments so finish() can read the freshest value even when the
+  // last final result lands after the click (React state is async).
+  const segmentsRef = useRef<TranscriptSegment[]>([]);
+  // Captured payload for a save that can be retried without re-recording.
+  const pendingRef = useRef<{
+    segments: TranscriptSegment[];
+    durationSec: number;
+    audioBlob: Blob | null;
+  } | null>(null);
 
   useEffect(() => {
     setSupported(
@@ -88,16 +97,26 @@ export default function Recorder() {
   }, [phase]);
 
   useEffect(() => {
+    segmentsRef.current = segments;
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [segments.length, interim]);
+  }, [segments, interim]);
 
   const cleanup = () => {
+    // Prevent onend from restarting recognition after we stop it (otherwise
+    // the mic keeps capturing after navigating away mid-recording).
+    phaseRef.current = "idle";
     if (timerRef.current) clearInterval(timerRef.current);
     cancelAnimationFrame(rafRef.current);
-    try {
-      recRef.current?.stop();
-    } catch {
-      /* noop */
+    const rec = recRef.current;
+    if (rec) {
+      rec.onend = null;
+      rec.onresult = null;
+      rec.onerror = null;
+      try {
+        rec.stop();
+      } catch {
+        /* noop */
+      }
     }
     try {
       if (mediaRef.current && mediaRef.current.state !== "inactive") {
@@ -261,14 +280,41 @@ export default function Recorder() {
     attachRecognition();
   };
 
+  // Stop recognition and wait for it to flush the final result (the last
+  // spoken sentence arrives via onresult AFTER stop()). Resolves on onend or a
+  // short timeout.
+  const stopRecognitionAndFlush = () =>
+    new Promise<void>((resolve) => {
+      const rec = recRef.current;
+      if (!rec) return resolve();
+      let done = false;
+      const finishOnce = () => {
+        if (done) return;
+        done = true;
+        resolve();
+      };
+      rec.onend = finishOnce;
+      try {
+        rec.stop();
+      } catch {
+        finishOnce();
+      }
+      setTimeout(finishOnce, 900);
+    });
+
   const finish = async () => {
+    const wasPaused = phaseRef.current === "paused";
     setPhase("saving");
     phaseRef.current = "saving";
-    try {
-      recRef.current?.stop();
-    } catch {
-      /* noop */
+    // If we finish while paused, close out the open pause so it isn't counted
+    // as recorded time.
+    if (wasPaused && pausedAtRef.current) {
+      pausedAccumRef.current += Date.now() - pausedAtRef.current;
+      pausedAtRef.current = 0;
     }
+
+    await stopRecognitionAndFlush();
+
     // flush the MediaRecorder
     const audioBlob = await new Promise<Blob | null>((resolve) => {
       const mr = mediaRef.current;
@@ -292,26 +338,65 @@ export default function Recorder() {
     cancelAnimationFrame(rafRef.current);
     if (timerRef.current) clearInterval(timerRef.current);
 
+    // Snapshot the recording so a failed save can be retried as-is.
+    pendingRef.current = {
+      segments: segmentsRef.current,
+      durationSec: Math.max(1, Math.floor(currentTime())),
+      audioBlob,
+    };
+    await saveRecording();
+  };
+
+  const saveRecording = async () => {
+    const payload = pendingRef.current;
+    if (!payload) return;
+    setPhase("saving");
+    phaseRef.current = "saving";
+    setError("");
     try {
       const res = await apiPost<{ note: { id: string } }>("/api/notes", {
         kind: "recording",
         title: title.trim() || undefined,
-        durationSec: Math.max(1, Math.floor(currentTime())),
-        segments,
+        durationSec: payload.durationSec,
+        segments: payload.segments,
       });
-      // attach the audio so it can be replayed
-      if (audioBlob && audioBlob.size > 0) {
-        const form = new FormData();
-        form.append("file", new File([audioBlob], "recording.webm", { type: "audio/webm" }));
-        form.append("attachTo", res.note.id);
-        await fetch("/api/upload", { method: "POST", body: form }).catch(
-          () => {}
-        );
+      // Attach the audio so it can be replayed. If this fails the transcript
+      // note still exists — tell the user the audio couldn't be saved instead
+      // of silently discarding it.
+      let audioSaved = true;
+      if (payload.audioBlob && payload.audioBlob.size > 0) {
+        try {
+          const form = new FormData();
+          form.append(
+            "file",
+            new File([payload.audioBlob], "recording.webm", {
+              type: "audio/webm",
+            })
+          );
+          form.append("attachTo", res.note.id);
+          const up = await fetch("/api/upload", {
+            method: "POST",
+            body: form,
+          });
+          audioSaved = up.ok;
+        } catch {
+          audioSaved = false;
+        }
       }
-      router.push(`/notes/${res.note.id}`);
+      pendingRef.current = null;
+      if (!audioSaved) {
+        // Persist the note but let the user know playback won't be available.
+        router.push(`/notes/${res.note.id}?audio=failed`);
+      } else {
+        router.push(`/notes/${res.note.id}`);
+      }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not save recording.");
-      setPhase("paused");
+      setError(
+        (e instanceof Error ? e.message : "Could not save recording.") +
+          " Your transcript is safe — tap Retry save."
+      );
+      setPhase("saveFailed");
+      phaseRef.current = "saveFailed";
     }
   };
 
@@ -398,7 +483,9 @@ export default function Recorder() {
                   ? "Recording"
                   : phase === "paused"
                     ? "Paused"
-                    : "Saving…"}
+                    : phase === "saveFailed"
+                      ? "Save failed"
+                      : "Saving…"}
               </span>
             </div>
             {/* level meter */}
@@ -451,23 +538,42 @@ export default function Recorder() {
 
           {/* controls */}
           <div className="mt-6 flex items-center justify-center gap-3">
-            {phase === "recording" ? (
-              <Button variant="secondary" onClick={pause} className="!px-5 !py-2.5">
-                <Pause size={17} /> Pause
+            {phase === "saveFailed" ? (
+              <Button
+                onClick={saveRecording}
+                className="!bg-rose-600 !px-5 !py-2.5 hover:!bg-rose-700"
+              >
+                <Square size={16} /> Retry save
               </Button>
-            ) : phase === "paused" ? (
-              <Button variant="secondary" onClick={resume} className="!px-5 !py-2.5">
-                <Play size={17} /> Resume
-              </Button>
-            ) : null}
-            <Button
-              onClick={finish}
-              loading={phase === "saving"}
-              disabled={segments.length === 0 && phase !== "saving"}
-              className="!bg-rose-600 !px-5 !py-2.5 hover:!bg-rose-700"
-            >
-              <Square size={16} /> Finish & create note
-            </Button>
+            ) : (
+              <>
+                {phase === "recording" ? (
+                  <Button
+                    variant="secondary"
+                    onClick={pause}
+                    className="!px-5 !py-2.5"
+                  >
+                    <Pause size={17} /> Pause
+                  </Button>
+                ) : phase === "paused" ? (
+                  <Button
+                    variant="secondary"
+                    onClick={resume}
+                    className="!px-5 !py-2.5"
+                  >
+                    <Play size={17} /> Resume
+                  </Button>
+                ) : null}
+                <Button
+                  onClick={finish}
+                  loading={phase === "saving"}
+                  disabled={segments.length === 0 && phase !== "saving"}
+                  className="!bg-rose-600 !px-5 !py-2.5 hover:!bg-rose-700"
+                >
+                  <Square size={16} /> Finish &amp; create note
+                </Button>
+              </>
+            )}
           </div>
           {segments.length === 0 && phase === "recording" && (
             <p className="mt-3 text-center text-xs text-slate-400">

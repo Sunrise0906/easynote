@@ -1,11 +1,14 @@
 # Continuous deployment to Fly.io.
 # Enable by adding a FLY_API_TOKEN repository secret
-# (create one with: fly tokens create deploy).
+# (create one with: fly tokens create deploy)
+# and setting the FLY_DEPLOY_ENABLED=true repository variable.
 
 name: Deploy to Fly.io
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
@@ -16,10 +19,16 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ vars.FLY_DEPLOY_ENABLED == 'true' }}
+    # Only deploy when CI passed (or on manual dispatch) and the toggle is on.
+    if: >-
+      vars.FLY_DEPLOY_ENABLED == 'true' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.workflow_run.conclusion == 'success')
     steps:
       - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
+      # Pinned to a release tag (not @master) so a compromised upstream
+      # branch can't run with FLY_API_TOKEN in scope.
+      - uses: superfly/flyctl-actions/setup-flyctl@v1.5
       - run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

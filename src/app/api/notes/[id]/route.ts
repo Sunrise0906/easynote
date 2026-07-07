@@ -40,7 +40,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
     if (body.folderId !== undefined) n.folderId = body.folderId;
     if (typeof body.notesMarkdown === "string") {
-      n.notesMarkdown = body.notesMarkdown;
+      // Bound the size so a single note file can't be bloated to megabytes
+      // (every listNotes/share lookup parses each note file).
+      n.notesMarkdown = body.notesMarkdown.slice(0, 500_000);
     }
     if (typeof body.emoji === "string" && body.emoji) {
       n.emoji = body.emoji.slice(0, 8);

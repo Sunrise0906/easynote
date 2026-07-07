@@ -21,23 +21,37 @@ export default function SettingsView() {
 
   const upgrade = async (interval: "monthly" | "yearly") => {
     setBusy(interval);
-    await apiPost("/api/billing", { action: "upgrade", interval });
-    await load();
-    setBusy(null);
-    window.dispatchEvent(new Event("easynote:refresh-sidebar"));
+    try {
+      await apiPost("/api/billing", { action: "upgrade", interval });
+      await load();
+      window.dispatchEvent(new Event("easynote:refresh-sidebar"));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Could not update your plan.");
+    } finally {
+      setBusy(null);
+    }
   };
 
   const cancel = async () => {
     if (!confirm("Downgrade to the Starter plan?")) return;
     setBusy("cancel");
-    await apiPost("/api/billing", { action: "cancel" });
-    await load();
-    setBusy(null);
-    window.dispatchEvent(new Event("easynote:refresh-sidebar"));
+    try {
+      await apiPost("/api/billing", { action: "cancel" });
+      await load();
+      window.dispatchEvent(new Event("easynote:refresh-sidebar"));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Could not update your plan.");
+    } finally {
+      setBusy(null);
+    }
   };
 
   const logoutEverywhere = async () => {
-    await apiPost("/api/auth/logout");
+    try {
+      await apiPost("/api/auth/logout");
+    } catch {
+      /* clear client state regardless */
+    }
     router.push("/home");
     router.refresh();
   };

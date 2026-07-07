@@ -51,6 +51,11 @@ export async function structuredRequest<T>(opts: {
   if (final.stop_reason === "refusal") {
     throw new Error("The AI declined to process this content.");
   }
+  if (final.stop_reason === "max_tokens") {
+    throw new Error(
+      "This content is too large to process in one pass. Try a shorter source or split it up."
+    );
+  }
   const text = final.content
     .filter((b) => b.type === "text")
     .map((b) => (b as { text: string }).text)

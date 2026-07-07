@@ -257,10 +257,17 @@ ${truncateChars(note.notesMarkdown ?? "", MATERIAL_BUDGET)}`;
 /* Vision: extract text/content from an image                          */
 /* ------------------------------------------------------------------ */
 
+const IMAGE_API_LIMIT = 5 * 1024 * 1024; // Anthropic image byte limit
+
 export async function extractFromImage(
   data: Buffer,
   mediaType: string
 ): Promise<string> {
+  if (data.length > IMAGE_API_LIMIT) {
+    throw new Error(
+      "This image is too large to read (over 5 MB). Please use a smaller or more compressed image."
+    );
+  }
   const client = anthropic();
   const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
   const mt = allowed.includes(mediaType) ? mediaType : "image/png";
@@ -301,7 +308,14 @@ export async function extractFromImage(
 /* PDF fallback: let Claude read the PDF directly (scanned PDFs etc.)  */
 /* ------------------------------------------------------------------ */
 
+const PDF_API_LIMIT = 20 * 1024 * 1024; // stay under the 32 MB request cap after base64
+
 export async function extractFromPdfViaClaude(data: Buffer): Promise<string> {
+  if (data.length > PDF_API_LIMIT) {
+    throw new Error(
+      "This scanned PDF is too large to read with AI (over 20 MB). Please upload a smaller file or one with selectable text."
+    );
+  }
   const client = anthropic();
   const stream = client.messages.stream({
     model: MODEL(),
@@ -330,8 +344,17 @@ export async function extractFromPdfViaClaude(data: Buffer): Promise<string> {
   if (final.stop_reason === "refusal") {
     throw new Error("The AI declined to process this document.");
   }
-  return final.content
+  const text = final.content
     .filter((b) => b.type === "text")
     .map((b) => (b as { text: string }).text)
     .join("");
+  // Very long scanned PDFs can hit the output cap; flag the truncation rather
+  // than silently dropping the tail.
+  if (final.stop_reason === "max_tokens") {
+    return (
+      text +
+      "\n\n[Note: this document was long and only the first portion could be read.]"
+    );
+  }
+  return text;
 }

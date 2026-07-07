@@ -8,6 +8,7 @@ import {
 } from "@/lib/ai/generate";
 import { AiNotConfiguredError } from "@/lib/ai/client";
 import { PLANS } from "@/lib/config";
+import { rateLimit } from "@/lib/ratelimit";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -18,6 +19,14 @@ type Params = { params: Promise<{ id: string }> };
 export async function POST(req: NextRequest, { params }: Params) {
   const auth = await requireUser();
   if (auth.response) return auth.response;
+  // Each call is an expensive Claude request billed to the deployment's key —
+  // bound per-user spend (not spoofable, keyed on the account).
+  if (!rateLimit(`ai:gen:${auth.user.id}`, 60, 60 * 60 * 1000)) {
+    return jsonError(
+      "You're generating study material very fast — please wait a minute and try again.",
+      429
+    );
+  }
   const { id } = await params;
   const note = await getNote(id);
   if (!note || note.userId !== auth.user.id) {

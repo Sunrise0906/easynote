@@ -22,6 +22,9 @@ export const config = {
       process.env.STT_BASE_URL || "https://api.openai.com/v1"
     ).replace(/\/$/, ""),
     model: process.env.STT_MODEL || "whisper-1",
+    // Whisper-compatible endpoints cap uploads at 25 MB. Audio/video files are
+    // rejected above this regardless of plan, so users fail fast.
+    maxMB: Number(process.env.STT_MAX_MB || 25),
   },
 
   session: {

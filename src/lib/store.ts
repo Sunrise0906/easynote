@@ -234,6 +234,66 @@ export async function updateUser(
   });
 }
 
+/**
+ * Atomically create a user only if no account with the same email exists.
+ * Serializes the check-and-insert under the users lock so two concurrent
+ * registrations can't both succeed with the same email.
+ */
+export async function createUserIfAbsent(
+  user: User
+): Promise<{ ok: true } | { ok: false; reason: "exists" }> {
+  return withLock("users", async () => {
+    const users = await readJson<User[]>(USERS_FILE(), []);
+    if (users.some((u) => u.email === user.email)) {
+      return { ok: false as const, reason: "exists" as const };
+    }
+    users.push(user);
+    await writeJson(USERS_FILE(), users);
+    return { ok: true as const };
+  });
+}
+
+/**
+ * Atomically check a per-period usage counter and increment it only if under
+ * the limit. Returns whether the action is allowed. This closes the
+ * check-then-increment race that lets concurrent requests bypass quotas.
+ */
+export async function consumeQuota(
+  id: string,
+  kind: "notes" | "chat",
+  periodKey: string,
+  limit: number
+): Promise<boolean> {
+  const result = await withLock("users", async () => {
+    const users = await readJson<User[]>(USERS_FILE(), []);
+    const user = users.find((u) => u.id === id);
+    if (!user) return false;
+    const map = user.usage[kind];
+    const used = map[periodKey] ?? 0;
+    if (used >= limit) return false;
+    map[periodKey] = used + 1;
+    await writeJson(USERS_FILE(), users);
+    return true;
+  });
+  return result;
+}
+
+/** Give back a previously consumed quota unit (used when an AI call fails). */
+export async function refundQuota(
+  id: string,
+  kind: "notes" | "chat",
+  periodKey: string
+): Promise<void> {
+  await withLock("users", async () => {
+    const users = await readJson<User[]>(USERS_FILE(), []);
+    const user = users.find((u) => u.id === id);
+    if (!user) return;
+    const map = user.usage[kind];
+    if ((map[periodKey] ?? 0) > 0) map[periodKey] -= 1;
+    await writeJson(USERS_FILE(), users);
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* Sessions                                                            */
 /* ------------------------------------------------------------------ */

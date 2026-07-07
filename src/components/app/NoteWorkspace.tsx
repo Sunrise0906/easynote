@@ -79,14 +79,36 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
   const [busy, setBusy] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [toolbarError, setToolbarError] = useState("");
+  const [audioWarn, setAudioWarn] = useState(false);
+
+  // Recorder redirects here with ?audio=failed when the audio couldn't be
+  // attached — the transcript note is fine, but playback isn't available.
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("audio") === "failed"
+    ) {
+      setAudioWarn(true);
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, []);
 
   const load = useCallback(async () => {
     try {
       const res = await apiGet<{ note: NoteData }>(`/api/notes/${noteId}`);
       setNote(res.note);
+      setLoadError("");
       return res.note;
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : "Could not load note.");
+      // Only fail hard on the INITIAL load. A transient failure during
+      // polling (network blip, redeploy) must not replace an already-loaded,
+      // still-processing workspace with the error page.
+      setNote((cur) => {
+        if (!cur) {
+          setLoadError(e instanceof Error ? e.message : "Could not load note.");
+        }
+        return cur;
+      });
       return null;
     }
   }, [noteId]);
@@ -141,9 +163,15 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
 
   const retry = async () => {
     setRetrying(true);
-    await apiPost(`/api/notes/${note.id}/retry`);
-    setRetrying(false);
-    load();
+    setToolbarError("");
+    try {
+      await apiPost(`/api/notes/${note.id}/retry`);
+      await load();
+    } catch (e) {
+      setToolbarError(e instanceof Error ? e.message : "Could not retry.");
+    } finally {
+      setRetrying(false);
+    }
   };
 
   const translate = async (language: string) => {
@@ -175,12 +203,20 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
 
   const toggleShare = async (enabled: boolean) => {
     setShareBusy(true);
-    const res = await apiPost<{ shareToken: string | null }>(
-      `/api/notes/${note.id}/share`,
-      { enabled }
-    );
-    setNote({ ...note, shareToken: res.shareToken });
-    setShareBusy(false);
+    setToolbarError("");
+    try {
+      const res = await apiPost<{ shareToken: string | null }>(
+        `/api/notes/${note.id}/share`,
+        { enabled }
+      );
+      setNote({ ...note, shareToken: res.shareToken });
+    } catch (e) {
+      setToolbarError(
+        e instanceof Error ? e.message : "Could not update sharing."
+      );
+    } finally {
+      setShareBusy(false);
+    }
   };
 
   const copyShare = async () => {
@@ -194,28 +230,47 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
 
   const rename = async () => {
     setBusy(true);
-    const res = await apiPatch<{ note: NoteData }>(`/api/notes/${note.id}`, {
-      title,
-    });
-    setNote(res.note);
-    setBusy(false);
-    setRenameOpen(false);
+    setToolbarError("");
+    try {
+      const res = await apiPatch<{ note: NoteData }>(`/api/notes/${note.id}`, {
+        title,
+      });
+      setNote(res.note);
+      setRenameOpen(false);
+    } catch (e) {
+      setToolbarError(e instanceof Error ? e.message : "Could not rename.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const move = async (folderId: string | null) => {
     setBusy(true);
-    const res = await apiPatch<{ note: NoteData }>(`/api/notes/${note.id}`, {
-      folderId,
-    });
-    setNote(res.note);
-    setBusy(false);
-    setMoveOpen(false);
+    setToolbarError("");
+    try {
+      const res = await apiPatch<{ note: NoteData }>(`/api/notes/${note.id}`, {
+        folderId,
+      });
+      setNote(res.note);
+      setMoveOpen(false);
+    } catch (e) {
+      setToolbarError(e instanceof Error ? e.message : "Could not move note.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const remove = async () => {
     setBusy(true);
-    await apiDelete(`/api/notes/${note.id}`);
-    router.push("/notes");
+    setToolbarError("");
+    try {
+      await apiDelete(`/api/notes/${note.id}`);
+      router.push("/notes");
+    } catch (e) {
+      setToolbarError(e instanceof Error ? e.message : "Could not delete.");
+      setBusy(false);
+      setDeleteOpen(false);
+    }
   };
 
   const hasMedia =
@@ -384,6 +439,21 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
         </div>
       )}
 
+      {audioWarn && (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800">
+          <span>
+            Your transcript was saved, but the audio couldn&apos;t be attached
+            — playback won&apos;t be available for this recording.
+          </span>
+          <button
+            onClick={() => setAudioWarn(false)}
+            className="shrink-0 font-semibold underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {processing || note.status === "error" ? (
         <ProcessSteps note={note} onRetry={retry} retrying={retrying} />
       ) : (
@@ -466,7 +536,13 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
             {tab === "quiz" && (
               <QuizTab note={note} onNoteChange={setNote} aiReady={aiReady} />
             )}
-            {tab === "chat" && <ChatTab note={note} aiReady={aiReady} />}
+            {tab === "chat" && (
+              <ChatTab
+                note={note}
+                aiReady={aiReady}
+                onNoteChange={setNote}
+              />
+            )}
             {tab === "mindmap" && <MindmapTab note={note} />}
           </div>
         </>

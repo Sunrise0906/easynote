@@ -52,12 +52,22 @@ export default function NotesTab({
 
   const save = async () => {
     setSaving(true);
-    const res = await apiPatch<{ note: NoteData }>(`/api/notes/${note.id}`, {
-      notesMarkdown: draft,
-    });
-    onNoteChange(res.note);
-    setSaving(false);
-    setEditing(false);
+    setGenError("");
+    try {
+      const res = await apiPatch<{ note: NoteData }>(`/api/notes/${note.id}`, {
+        notesMarkdown: draft,
+      });
+      onNoteChange(res.note);
+      setEditing(false);
+    } catch (e) {
+      // Keep editing mode + the draft so the user can retry without losing work.
+      setGenError(
+        (e instanceof Error ? e.message : "Could not save.") +
+          " Your edits are still here — try again."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   const generateNotes = async () => {

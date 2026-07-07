@@ -3,7 +3,7 @@ import { jsonError, requireUser } from "@/lib/api";
 import { getNote, updateNote } from "@/lib/store";
 import { streamChatReply } from "@/lib/ai/chat";
 import { AiNotConfiguredError } from "@/lib/ai/client";
-import { canChat, recordChatMessage } from "@/lib/quota";
+import { canChat, releaseChat, reserveChat } from "@/lib/quota";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -39,22 +39,36 @@ export async function POST(req: NextRequest, { params }: Params) {
   if (!message) return jsonError("Empty message.");
   if (message.length > 4000) return jsonError("Message too long.");
 
+  // Drop any historically-persisted empty messages so a prior refusal can't
+  // poison the conversation (the API rejects empty-content messages with 400).
   const history = [
-    ...note.chat.map((m) => ({ role: m.role, content: m.content })),
+    ...note.chat
+      .filter((m) => m.content.trim().length > 0)
+      .map((m) => ({ role: m.role, content: m.content })),
     { role: "user" as const, content: message },
   ];
+
+  // Atomically reserve a daily chat slot; refund it if the reply fails so an
+  // outage doesn't silently burn the user's quota.
+  if (!(await reserveChat(user))) {
+    return jsonError(
+      "You've hit today's chat limit on the Starter plan. Upgrade to Pro for unlimited chat.",
+      403,
+      "quota_exceeded"
+    );
+  }
 
   let stream: ReturnType<typeof streamChatReply>;
   try {
     stream = streamChatReply(note, history);
   } catch (err) {
+    await releaseChat(user.id);
     if (err instanceof AiNotConfiguredError) {
       return jsonError(err.message, 503, err.code);
     }
     throw err;
   }
 
-  await recordChatMessage(user.id);
   const userTs = Date.now();
   const encoder = new TextEncoder();
 
@@ -78,6 +92,19 @@ export async function POST(req: NextRequest, { params }: Params) {
           .filter((b) => b.type === "text")
           .map((b) => (b as { text: string }).text)
           .join("");
+
+        // A refusal or any reply with no text must NOT be persisted as an
+        // empty assistant message — that would 400 every future turn on this
+        // note. Surface an error and refund the quota instead.
+        if (final.stop_reason === "refusal" || reply.trim().length === 0) {
+          await releaseChat(user.id);
+          send({
+            error:
+              "I couldn't answer that one. Try rephrasing your question.",
+          });
+          return;
+        }
+
         await updateNote(id, (n) => {
           n.chat.push({ role: "user", content: message, ts: userTs });
           n.chat.push({ role: "assistant", content: reply, ts: Date.now() });
@@ -85,6 +112,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         });
         send({ done: true });
       } catch (err) {
+        await releaseChat(user.id);
         send({
           error:
             err instanceof Error

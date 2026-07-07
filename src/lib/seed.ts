@@ -15,7 +15,7 @@ export async function ensureDemoData(): Promise<void> {
     id: "u_demo",
     email: "demo@easynote.local",
     name: "Demo Student",
-    passwordHash: hashPassword("demo1234"),
+    passwordHash: await hashPassword("demo1234"),
     guest: false,
     plan: "free",
     usage: { notes: {}, chat: {} },

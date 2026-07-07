@@ -15,6 +15,7 @@ export default function Dashboard() {
   const folderId = params.get("folder");
   const [notes, setNotes] = useState<NoteSummaryData[] | null>(null);
   const [folders, setFolders] = useState<FolderData[]>([]);
+  const [loadError, setLoadError] = useState("");
   const [query, setQuery] = useState("");
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -26,8 +27,19 @@ export default function Dashboard() {
       ]);
       setNotes(n.notes);
       setFolders(f.folders);
+      setLoadError("");
       return n.notes;
-    } catch {
+    } catch (e) {
+      // Only surface an error if we have nothing to show yet; a transient
+      // polling failure shouldn't blank an already-loaded dashboard.
+      setNotes((cur) => {
+        if (cur === null) {
+          setLoadError(
+            e instanceof Error ? e.message : "Could not load your notes."
+          );
+        }
+        return cur;
+      });
       return [];
     }
   }, []);
@@ -118,7 +130,18 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {notes === null ? (
+      {notes === null && loadError ? (
+        <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-6 py-12 text-center">
+          <div className="text-3xl">😕</div>
+          <div className="mt-3 font-semibold text-rose-800">{loadError}</div>
+          <button
+            onClick={() => load()}
+            className="mt-4 rounded-xl bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+          >
+            Try again
+          </button>
+        </div>
+      ) : notes === null ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
             <div

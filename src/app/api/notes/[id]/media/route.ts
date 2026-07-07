@@ -5,6 +5,7 @@ import { Readable } from "stream";
 import { NextRequest } from "next/server";
 import { jsonError, requireUser } from "@/lib/api";
 import { getNote, uploadsDir } from "@/lib/store";
+import { safeMediaContentType } from "@/lib/media";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -31,7 +32,13 @@ export async function GET(req: NextRequest, { params }: Params) {
     return jsonError("Media file is missing.", 404);
   }
 
-  const mime = note.mediaMime || "application/octet-stream";
+  // Never echo the client-supplied MIME — derive a safe type from sourceType
+  // so a file uploaded as text/html or image/svg+xml can't run as script.
+  const { contentType, inline } = safeMediaContentType(
+    note.sourceType,
+    note.mediaMime
+  );
+  const disposition = inline ? "inline" : "attachment";
   const range = req.headers.get("range");
 
   if (range) {
@@ -51,7 +58,8 @@ export async function GET(req: NextRequest, { params }: Params) {
       {
         status: 206,
         headers: {
-          "Content-Type": mime,
+          "Content-Type": contentType,
+          "Content-Disposition": disposition,
           "Content-Length": String(end - start + 1),
           "Content-Range": `bytes ${start}-${end}/${stat.size}`,
           "Accept-Ranges": "bytes",
@@ -63,7 +71,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 
   return new Response(toWebStream(fs.createReadStream(filePath)), {
     headers: {
-      "Content-Type": mime,
+      "Content-Type": contentType,
+      "Content-Disposition": disposition,
       "Content-Length": String(stat.size),
       "Accept-Ranges": "bytes",
       "Cache-Control": "private, max-age=3600",

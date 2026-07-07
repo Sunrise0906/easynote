@@ -64,13 +64,21 @@ export default function Sidebar() {
   const removeFolder = async (id: string, name: string) => {
     if (!confirm(`Delete folder “${name}”? Notes inside move to All notes.`))
       return;
-    await apiDelete(`/api/folders/${id}`);
-    refresh();
-    router.push("/notes");
+    try {
+      await apiDelete(`/api/folders/${id}`);
+      refresh();
+      router.push("/notes");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Could not delete folder.");
+    }
   };
 
   const logout = async () => {
-    await apiPost("/api/auth/logout");
+    try {
+      await apiPost("/api/auth/logout");
+    } catch {
+      /* clear client state regardless */
+    }
     router.push("/home");
     router.refresh();
   };

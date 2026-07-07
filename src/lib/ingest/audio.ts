@@ -1,7 +1,7 @@
 import { config, sttConfigured } from "../config";
 import { TranscriptSegment } from "../store";
 
-const STT_MAX_MB = 25;
+const STT_MAX_MB = config.stt.maxMB;
 
 /**
  * Transcribe an uploaded audio/video file through an OpenAI-compatible

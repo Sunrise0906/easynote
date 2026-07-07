@@ -17,9 +17,11 @@ const SUGGESTIONS = [
 export default function ChatTab({
   note,
   aiReady,
+  onNoteChange,
 }: {
   note: NoteData;
   aiReady: boolean;
+  onNoteChange?: (n: NoteData) => void;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(note.chat ?? []);
   const [input, setInput] = useState("");
@@ -32,22 +34,33 @@ export default function ChatTab({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, partial]);
 
+  // Persist chat into the parent note so switching tabs (which unmounts this
+  // component) doesn't lose the just-sent messages.
+  const commit = (next: ChatMessage[]) => {
+    setMessages(next);
+    onNoteChange?.({ ...note, chat: next });
+  };
+
   const send = async (text: string) => {
     const message = text.trim();
     if (!message || streaming) return;
     setError("");
     setInput("");
-    setMessages((m) => [...m, { role: "user", content: message, ts: Date.now() }]);
+    const withUser: ChatMessage[] = [
+      ...messages,
+      { role: "user", content: message, ts: Date.now() },
+    ];
+    setMessages(withUser);
     setStreaming(true);
     setPartial("");
+    let acc = "";
     try {
-      let acc = "";
       const full = await streamChat(note.id, message, (chunk) => {
         acc += chunk;
         setPartial(acc);
       });
-      setMessages((m) => [
-        ...m,
+      commit([
+        ...withUser,
         { role: "assistant", content: full, ts: Date.now() },
       ]);
     } catch (e) {
@@ -56,9 +69,20 @@ export default function ChatTab({
       } else {
         setError(e instanceof Error ? e.message : "The reply failed.");
       }
-      // roll back optimistic user message on hard failure with no partial
-      if (!partial) {
-        setMessages((m) => m.slice(0, -1));
+      // If a partial reply had streamed, keep the user message and show what
+      // arrived (marked interrupted). Otherwise roll back the user message and
+      // restore it to the input so nothing is silently lost.
+      if (acc.trim()) {
+        commit([
+          ...withUser,
+          {
+            role: "assistant",
+            content: acc + "\n\n_(reply interrupted)_",
+            ts: Date.now(),
+          },
+        ]);
+      } else {
+        setMessages(messages);
         setInput(message);
       }
     } finally {
@@ -69,8 +93,12 @@ export default function ChatTab({
 
   const clear = async () => {
     if (!confirm("Clear this note's chat history?")) return;
-    await apiDelete(`/api/notes/${note.id}/chat`);
-    setMessages([]);
+    try {
+      await apiDelete(`/api/notes/${note.id}/chat`);
+      commit([]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not clear chat.");
+    }
   };
 
   if (!aiReady) {
