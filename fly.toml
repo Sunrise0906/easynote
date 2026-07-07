@@ -8,8 +8,8 @@
 #
 # The app name below is a placeholder — `fly launch` will rewrite it.
 
-app = "easynote"
-primary_region = "sjc"
+app = "easynote-1b78a8"
+primary_region = "nrt"
 
 [build]
   dockerfile = "Dockerfile"
