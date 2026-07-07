@@ -119,7 +119,13 @@ export interface MeResponse {
     chatLimit: number;
     maxUploadMB: number;
   };
-  capabilities?: { ai: boolean; stt: boolean };
+  capabilities?: {
+    ai: boolean;
+    stt: boolean;
+    vision?: boolean;
+    provider?: "anthropic" | "openai";
+    model?: string;
+  };
 }
 
 export const SOURCE_LABEL: Record<SourceType, string> = {

@@ -1,6 +1,6 @@
 import fsp from "fs/promises";
 import path from "path";
-import { aiConfigured } from "../config";
+import { aiConfigured, pdfAiConfigured } from "../config";
 import {
   Note,
   TranscriptSegment,
@@ -52,10 +52,11 @@ async function acquireTranscript(note: Note): Promise<{
       const data = await readMedia(note);
       const { segments, totalChars } = await extractPdfText(data);
       if (totalChars >= 200) return { segments };
-      // Nearly no embedded text — probably a scanned PDF. Let Claude read it.
-      if (!aiConfigured()) {
+      // Nearly no embedded text — probably a scanned PDF. Native PDF reading
+      // is Anthropic-only; other providers can't read scanned pages.
+      if (!pdfAiConfigured()) {
         throw new Error(
-          "This PDF appears to be scanned (no embedded text). Configure ANTHROPIC_API_KEY so the AI can read it."
+          "This PDF appears to be scanned (no selectable text). Native PDF reading requires the Anthropic provider — set ANTHROPIC_API_KEY, or upload a PDF that has real text."
         );
       }
       const text = await extractFromPdfViaClaude(data);

@@ -12,6 +12,30 @@ export const config = {
   },
 
   /**
+   * AI provider selection. Defaults to Anthropic (Claude). To use a cheaper
+   * OpenAI-compatible provider (DeepSeek, Zhipu GLM, Qwen/DashScope, Kimi,
+   * MiniMax, OpenAI, Groq, …) set:
+   *   AI_PROVIDER=openai
+   *   AI_BASE_URL=https://api.deepseek.com          (provider's base URL)
+   *   AI_API_KEY=...                                (provider key)
+   *   AI_MODEL=deepseek-v4-flash                    (text model)
+   *   AI_VISION_MODEL=glm-4.6v                       (optional; enables image OCR)
+   * If AI_BASE_URL + AI_API_KEY are set, "openai" mode is auto-selected.
+   */
+  ai: {
+    provider: (process.env.AI_PROVIDER ||
+      (process.env.AI_BASE_URL && process.env.AI_API_KEY
+        ? "openai"
+        : "anthropic")) as "anthropic" | "openai",
+    openai: {
+      apiKey: process.env.AI_API_KEY || "",
+      baseUrl: (process.env.AI_BASE_URL || "").replace(/\/$/, ""),
+      model: process.env.AI_MODEL || "",
+      visionModel: process.env.AI_VISION_MODEL || "",
+    },
+  },
+
+  /**
    * Speech-to-text for uploaded audio/video files. Any OpenAI-compatible
    * transcription endpoint works (OpenAI whisper-1, Groq whisper-large-v3, …).
    * Live recording in the browser does NOT need this — it uses the Web Speech API.
@@ -46,7 +70,23 @@ export function appUrl(): string {
 }
 
 export function aiConfigured(): boolean {
+  if (config.ai.provider === "openai") {
+    return Boolean(config.ai.openai.apiKey && config.ai.openai.baseUrl && config.ai.openai.model);
+  }
   return Boolean(config.anthropic.apiKey);
+}
+
+/** Whether the configured provider can read images (OCR). */
+export function visionConfigured(): boolean {
+  if (config.ai.provider === "openai") {
+    return Boolean(config.ai.openai.visionModel);
+  }
+  return Boolean(config.anthropic.apiKey);
+}
+
+/** Whether the configured provider can read PDFs natively (Anthropic only). */
+export function pdfAiConfigured(): boolean {
+  return config.ai.provider === "anthropic" && Boolean(config.anthropic.apiKey);
 }
 
 export function sttConfigured(): boolean {

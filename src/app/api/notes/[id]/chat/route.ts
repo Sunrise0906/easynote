@@ -3,6 +3,8 @@ import { jsonError, requireUser } from "@/lib/api";
 import { getNote, updateNote } from "@/lib/store";
 import { streamChatReply } from "@/lib/ai/chat";
 import { AiNotConfiguredError } from "@/lib/ai/client";
+import { RefusalError } from "@/lib/ai/provider";
+import { aiConfigured } from "@/lib/config";
 import { canChat, releaseChat, reserveChat } from "@/lib/quota";
 
 type Params = { params: Promise<{ id: string }> };
@@ -58,17 +60,13 @@ export async function POST(req: NextRequest, { params }: Params) {
     );
   }
 
-  let stream: ReturnType<typeof streamChatReply>;
-  try {
-    stream = streamChatReply(note, history);
-  } catch (err) {
+  // Provider not configured surfaces before we open the stream.
+  if (!aiConfigured()) {
     await releaseChat(user.id);
-    if (err instanceof AiNotConfiguredError) {
-      return jsonError(err.message, 503, err.code);
-    }
-    throw err;
+    return jsonError(new AiNotConfiguredError().message, 503, "ai_not_configured");
   }
 
+  const stream = streamChatReply(note, history);
   const userTs = Date.now();
   const encoder = new TextEncoder();
 
@@ -79,24 +77,16 @@ export async function POST(req: NextRequest, { params }: Params) {
           encoder.encode(`data: ${JSON.stringify(payload)}\n\n`)
         );
       try {
-        for await (const event of stream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
-            send({ text: event.delta.text });
-          }
+        let reply = "";
+        for await (const delta of stream) {
+          reply += delta;
+          send({ text: delta });
         }
-        const final = await stream.finalMessage();
-        const reply = final.content
-          .filter((b) => b.type === "text")
-          .map((b) => (b as { text: string }).text)
-          .join("");
 
         // A refusal or any reply with no text must NOT be persisted as an
         // empty assistant message — that would 400 every future turn on this
         // note. Surface an error and refund the quota instead.
-        if (final.stop_reason === "refusal" || reply.trim().length === 0) {
+        if (reply.trim().length === 0) {
           await releaseChat(user.id);
           send({
             error:
@@ -112,6 +102,13 @@ export async function POST(req: NextRequest, { params }: Params) {
         });
         send({ done: true });
       } catch (err) {
+        if (err instanceof RefusalError) {
+          await releaseChat(user.id);
+          send({
+            error: "I couldn't answer that one. Try rephrasing your question.",
+          });
+          return;
+        }
         await releaseChat(user.id);
         send({
           error:

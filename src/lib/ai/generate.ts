@@ -1,6 +1,7 @@
 import { Flashcard, Note, QuizQuestion, transcriptFullText } from "../store";
 import { truncateChars } from "../utils";
-import { anthropic, MODEL, structuredRequest } from "./client";
+import { anthropic, MODEL } from "./client";
+import { generateJSON, visionExtract } from "./provider";
 
 /** Character budget for material fed into generation prompts. */
 const MATERIAL_BUDGET = 200_000;
@@ -90,7 +91,7 @@ Rules for notesMarkdown:
     note
   )}`;
 
-  return structuredRequest<GeneratedNoteContent>({
+  return generateJSON<GeneratedNoteContent>({
     system,
     user,
     schema: NOTE_SCHEMA as unknown as Record<string, unknown>,
@@ -136,7 +137,7 @@ export async function generateFlashcards(
     note
   )}`;
 
-  const result = await structuredRequest<{ cards: Flashcard[] }>({
+  const result = await generateJSON<{ cards: Flashcard[] }>({
     system,
     user,
     schema: FLASHCARDS_SCHEMA as unknown as Record<string, unknown>,
@@ -195,7 +196,7 @@ export async function generateQuiz(
     note
   )}`;
 
-  const result = await structuredRequest<{ questions: QuizQuestion[] }>({
+  const result = await generateJSON<{ questions: QuizQuestion[] }>({
     system,
     user,
     schema: QUIZ_SCHEMA as unknown as Record<string, unknown>,
@@ -245,7 +246,7 @@ ${note.summary ?? ""}
 === NOTES (Markdown) ===
 ${truncateChars(note.notesMarkdown ?? "", MATERIAL_BUDGET)}`;
 
-  return structuredRequest<{ summary: string; notesMarkdown: string }>({
+  return generateJSON<{ summary: string; notesMarkdown: string }>({
     system,
     user,
     schema: TRANSLATION_SCHEMA as unknown as Record<string, unknown>,
@@ -257,7 +258,7 @@ ${truncateChars(note.notesMarkdown ?? "", MATERIAL_BUDGET)}`;
 /* Vision: extract text/content from an image                          */
 /* ------------------------------------------------------------------ */
 
-const IMAGE_API_LIMIT = 5 * 1024 * 1024; // Anthropic image byte limit
+const IMAGE_API_LIMIT = 5 * 1024 * 1024; // vision API byte limit
 
 export async function extractFromImage(
   data: Buffer,
@@ -268,40 +269,11 @@ export async function extractFromImage(
       "This image is too large to read (over 5 MB). Please use a smaller or more compressed image."
     );
   }
-  const client = anthropic();
-  const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-  const mt = allowed.includes(mediaType) ? mediaType : "image/png";
-  const stream = client.messages.stream({
-    model: MODEL(),
-    max_tokens: 8000,
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "image",
-            source: {
-              type: "base64",
-              media_type: mt as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
-              data: data.toString("base64"),
-            },
-          },
-          {
-            type: "text",
-            text: "Transcribe ALL text visible in this image (slides, whiteboard, handwriting, book page…), preserving structure. If the image contains diagrams or figures, describe them concisely in [brackets] where they appear. Output only the transcription/description — no commentary.",
-          },
-        ],
-      },
-    ],
-  });
-  const final = await stream.finalMessage();
-  if (final.stop_reason === "refusal") {
-    throw new Error("The AI declined to process this image.");
-  }
-  return final.content
-    .filter((b) => b.type === "text")
-    .map((b) => (b as { text: string }).text)
-    .join("");
+  return visionExtract(
+    data,
+    mediaType,
+    "Transcribe ALL text visible in this image (slides, whiteboard, handwriting, book page…), preserving structure. If the image contains diagrams or figures, describe them concisely in [brackets] where they appear. Output only the transcription/description — no commentary."
+  );
 }
 
 /* ------------------------------------------------------------------ */

@@ -172,11 +172,21 @@ export default function SettingsView() {
           <ServiceRow
             ok={Boolean(capabilities?.ai)}
             icon={<KeyRound size={16} />}
-            title="Claude (notes, flashcards, quiz, chat, translation)"
+            title="Text AI (notes, flashcards, quiz, chat, translation)"
             detail={
               capabilities?.ai
-                ? "ANTHROPIC_API_KEY detected — AI features are on."
-                : "Set ANTHROPIC_API_KEY in .env.local and restart the server."
+                ? `Active model: ${capabilities.model || "configured"} (${capabilities.provider === "openai" ? "OpenAI-compatible provider" : "Anthropic Claude"}).`
+                : "Set ANTHROPIC_API_KEY, or an AI_PROVIDER=openai config, and restart."
+            }
+          />
+          <ServiceRow
+            ok={Boolean(capabilities?.vision)}
+            icon={<KeyRound size={16} />}
+            title="Vision (read text from images)"
+            detail={
+              capabilities?.vision
+                ? "A vision-capable model is configured — image notes work."
+                : "Set a vision model (Claude, or AI_VISION_MODEL like glm-4.6v / qwen3-vl) to read images."
             }
           />
           <ServiceRow

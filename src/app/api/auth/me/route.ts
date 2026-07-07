@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
 import { quotaInfo } from "@/lib/quota";
-import { aiConfigured, sttConfigured } from "@/lib/config";
+import {
+  aiConfigured,
+  config,
+  sttConfigured,
+  visionConfigured,
+} from "@/lib/config";
 
 export async function GET() {
   const user = await currentUser();
@@ -17,6 +22,15 @@ export async function GET() {
       createdAt: user.createdAt,
     },
     quota: quotaInfo(user),
-    capabilities: { ai: aiConfigured(), stt: sttConfigured() },
+    capabilities: {
+      ai: aiConfigured(),
+      stt: sttConfigured(),
+      vision: visionConfigured(),
+      provider: config.ai.provider,
+      model:
+        config.ai.provider === "openai"
+          ? config.ai.openai.model
+          : config.anthropic.model,
+    },
   });
 }
