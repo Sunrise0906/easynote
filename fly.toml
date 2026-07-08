@@ -8,7 +8,7 @@
 #
 # The app name below is a placeholder — `fly launch` will rewrite it.
 
-app = "easynote-1b78a8"
+app = "recall-32387c"
 primary_region = "nrt"
 
 [build]
@@ -19,7 +19,7 @@ primary_region = "nrt"
   DATA_DIR = "/data"
 
 [mounts]
-  source = "easynote_data"
+  source = "recall_data"
   destination = "/data"
 
 [http_service]
