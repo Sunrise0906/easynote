@@ -66,7 +66,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     return jsonError(new AiNotConfiguredError().message, 503, "ai_not_configured");
   }
 
-  const stream = streamChatReply(note, history);
+  const stream = streamChatReply(note, history, user.modelId);
   const userTs = Date.now();
   const encoder = new TextEncoder();
 

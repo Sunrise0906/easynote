@@ -1,25 +1,30 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { config, visionConfigured } from "../config";
-import { AiNotConfiguredError, anthropic, MODEL } from "./client";
+import { AiNotConfiguredError, anthropic } from "./client";
+import {
+  ModelDef,
+  ThinkStripper,
+  resolveModel,
+  stripThink,
+} from "./models";
 
 /**
- * Provider-agnostic AI layer. Two backends:
- *  - "anthropic": the Claude SDK (structured outputs, native PDF, vision)
- *  - "openai":    any OpenAI-compatible /chat/completions endpoint
- *                 (DeepSeek, Zhipu GLM, Qwen, Kimi, MiniMax, OpenAI, Groq…)
- *
- * The rest of the app calls these functions and never touches a provider SDK
- * directly, so switching model/provider is a pure env-var change.
+ * Provider-agnostic AI layer. Routes each call to the user's selected model
+ * (Claude, GLM-5.2, MiniMax-M3, or a custom OpenAI-compatible model) and
+ * smooths over reasoning-model quirks (Zhipu's thinking param, MiniMax's
+ * inline <think> tags).
  */
 
-export function aiProvider(): "anthropic" | "openai" {
-  return config.ai.provider;
+function pick(modelId?: string | null): ModelDef {
+  const m = resolveModel(modelId);
+  if (!m) throw new AiNotConfiguredError();
+  return m;
 }
 
-function requireOpenAI() {
-  const o = config.ai.openai;
-  if (!o.apiKey || !o.baseUrl || !o.model) throw new AiNotConfiguredError();
-  return o;
+export class RefusalError extends Error {
+  refusal = true;
+  constructor() {
+    super("The AI declined to answer.");
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -36,74 +41,69 @@ interface ChatMessage {
       >;
 }
 
+function openaiBody(
+  m: ModelDef,
+  messages: ChatMessage[],
+  opts: { maxTokens: number; model?: string; jsonMode?: boolean; stream?: boolean }
+) {
+  // Reasoning models eat output budget; give inline-tag models headroom.
+  const maxTokens =
+    m.think === "inline-tag" ? Math.round(opts.maxTokens * 1.6) : opts.maxTokens;
+  const body: Record<string, unknown> = {
+    model: opts.model || m.model,
+    max_tokens: maxTokens,
+    messages,
+  };
+  if (opts.stream) body.stream = true;
+  if (opts.jsonMode) body.response_format = { type: "json_object" };
+  // Suppress reasoning where the provider supports a flag.
+  if (m.think === "zhipu-param") body.thinking = { type: "disabled" };
+  return body;
+}
+
 async function openaiChat(
+  m: ModelDef,
   messages: ChatMessage[],
   opts: { maxTokens: number; model?: string; jsonMode?: boolean }
 ): Promise<string> {
-  const o = requireOpenAI();
-  const res = await fetch(`${o.baseUrl}/chat/completions`, {
+  const res = await fetch(`${m.baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${o.apiKey}`,
+      Authorization: `Bearer ${m.apiKey}`,
     },
-    body: JSON.stringify({
-      model: opts.model || o.model,
-      max_tokens: opts.maxTokens,
-      messages,
-      ...(opts.jsonMode ? { response_format: { type: "json_object" } } : {}),
-    }),
+    body: JSON.stringify(openaiBody(m, messages, opts)),
   });
   if (!res.ok) {
-    let detail = `HTTP ${res.status}`;
-    try {
-      const body = (await res.json()) as {
-        error?: { message?: string } | string;
-      };
-      const m =
-        typeof body.error === "string" ? body.error : body.error?.message;
-      if (m) detail = m;
-    } catch {
-      /* keep status */
-    }
-    throw new Error(`AI request failed: ${detail}`);
+    throw new Error(`AI request failed: ${await errorDetail(res)}`);
   }
   const body = (await res.json()) as {
     choices?: { message?: { content?: string } }[];
   };
-  return body.choices?.[0]?.message?.content ?? "";
+  let text = body.choices?.[0]?.message?.content ?? "";
+  if (m.think === "inline-tag") text = stripThink(text);
+  return text;
 }
 
 async function* openaiStream(
+  m: ModelDef,
   messages: ChatMessage[],
-  opts: { maxTokens: number; model?: string }
+  opts: { maxTokens: number }
 ): AsyncGenerator<string> {
-  const o = requireOpenAI();
-  const res = await fetch(`${o.baseUrl}/chat/completions`, {
+  const res = await fetch(`${m.baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${o.apiKey}`,
+      Authorization: `Bearer ${m.apiKey}`,
     },
-    body: JSON.stringify({
-      model: opts.model || o.model,
-      max_tokens: opts.maxTokens,
-      stream: true,
-      messages,
-    }),
+    body: JSON.stringify(openaiBody(m, messages, { ...opts, stream: true })),
   });
   if (!res.ok || !res.body) {
-    let detail = `HTTP ${res.status}`;
-    try {
-      const b = (await res.json()) as { error?: { message?: string } };
-      if (b?.error?.message) detail = b.error.message;
-    } catch {
-      /* keep status */
-    }
-    throw new Error(`AI request failed: ${detail}`);
+    throw new Error(`AI request failed: ${await errorDetail(res)}`);
   }
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
+  const stripper = m.think === "inline-tag" ? new ThinkStripper() : null;
   let buffer = "";
   for (;;) {
     const { done, value } = await reader.read();
@@ -121,7 +121,10 @@ async function* openaiStream(
           choices?: { delta?: { content?: string } }[];
         };
         const delta = json.choices?.[0]?.delta?.content;
-        if (delta) yield delta;
+        if (delta) {
+          const out = stripper ? stripper.feed(delta) : delta;
+          if (out) yield out;
+        }
       } catch {
         /* ignore keep-alives / partial frames */
       }
@@ -129,39 +132,67 @@ async function* openaiStream(
   }
 }
 
+async function errorDetail(res: Response): Promise<string> {
+  try {
+    const body = (await res.json()) as {
+      error?: { message?: string } | string;
+      base_resp?: { status_msg?: string };
+    };
+    const m =
+      typeof body.error === "string"
+        ? body.error
+        : body.error?.message || body.base_resp?.status_msg;
+    if (m) return m;
+  } catch {
+    /* ignore */
+  }
+  return `HTTP ${res.status}`;
+}
+
 /** Pull a JSON object out of a possibly-fenced / chatty model reply. */
 function extractJson(text: string): unknown {
-  const cleaned = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "");
+  const cleaned = stripThink(text)
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/i, "");
   try {
     return JSON.parse(cleaned.trim());
   } catch {
-    // Fall back to the outermost { … } span.
     const start = cleaned.indexOf("{");
     const end = cleaned.lastIndexOf("}");
-    if (start >= 0 && end > start) {
-      return JSON.parse(cleaned.slice(start, end + 1));
-    }
+    if (start >= 0 && end > start) return JSON.parse(cleaned.slice(start, end + 1));
     throw new Error("AI returned malformed output. Please try again.");
   }
 }
 
 /* ------------------------------------------------------------------ */
-/* Public, provider-agnostic API                                       */
+/* Anthropic helpers                                                   */
 /* ------------------------------------------------------------------ */
 
-/** Structured JSON generation validated against a JSON schema. */
+function anthropicText(final: Anthropic.Message): string {
+  return final.content
+    .filter((b) => b.type === "text")
+    .map((b) => (b as { text: string }).text)
+    .join("");
+}
+
+/* ------------------------------------------------------------------ */
+/* Public, model-agnostic API                                          */
+/* ------------------------------------------------------------------ */
+
 export async function generateJSON<T>(opts: {
   system: string;
   user: string;
   schema: Record<string, unknown>;
   maxTokens?: number;
+  modelId?: string | null;
 }): Promise<T> {
+  const m = pick(opts.modelId);
   const maxTokens = opts.maxTokens ?? 16000;
 
-  if (aiProvider() === "anthropic") {
-    const client = anthropic();
-    const stream = client.messages.stream({
-      model: MODEL(),
+  if (m.provider === "anthropic") {
+    const stream = anthropic().messages.stream({
+      model: m.model,
       max_tokens: maxTokens,
       system: opts.system,
       messages: [{ role: "user", content: opts.user }],
@@ -174,24 +205,29 @@ export async function generateJSON<T>(opts: {
       throw new Error(
         "This content is too large to process in one pass. Try a shorter source or split it up."
       );
-    const text = final.content
-      .filter((b) => b.type === "text")
-      .map((b) => (b as { text: string }).text)
-      .join("");
-    return extractJson(text) as T;
+    return extractJson(anthropicText(final)) as T;
   }
 
-  // OpenAI-compatible: schema in the prompt + json_object mode + validate.
-  const system = `${opts.system}\n\nYou must respond with a single valid JSON object and nothing else — no markdown, no commentary. The JSON must conform to this schema:\n${JSON.stringify(opts.schema)}`;
+  const noThink =
+    m.think === "inline-tag"
+      ? " Do not include any reasoning or <think> blocks — output only the JSON object."
+      : "";
+  const system = `${opts.system}\n\nRespond with a single valid JSON object and nothing else — no markdown, no commentary.${noThink} The JSON must conform to this schema:\n${JSON.stringify(opts.schema)}`;
+  // Reasoning models occasionally return empty content; retry a few times.
   let lastErr: unknown;
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (let attempt = 0; attempt < 3; attempt++) {
     const text = await openaiChat(
+      m,
       [
         { role: "system", content: system },
         { role: "user", content: opts.user },
       ],
       { maxTokens, jsonMode: true }
     );
+    if (text.trim().length === 0) {
+      lastErr = new Error("The AI returned an empty response.");
+      continue;
+    }
     try {
       return extractJson(text) as T;
     } catch (e) {
@@ -203,46 +239,18 @@ export async function generateJSON<T>(opts: {
     : new Error("AI returned malformed output. Please try again.");
 }
 
-/** Plain-text (non-streaming) completion. */
-export async function generateText(opts: {
-  system: string;
-  messages: { role: "user" | "assistant"; content: string }[];
-  maxTokens?: number;
-}): Promise<string> {
-  const maxTokens = opts.maxTokens ?? 8000;
-  if (aiProvider() === "anthropic") {
-    const client = anthropic();
-    const stream = client.messages.stream({
-      model: MODEL(),
-      max_tokens: maxTokens,
-      system: opts.system,
-      messages: opts.messages as Anthropic.MessageParam[],
-    });
-    const final = await stream.finalMessage();
-    if (final.stop_reason === "refusal")
-      throw new Error("The AI declined to process this content.");
-    return final.content
-      .filter((b) => b.type === "text")
-      .map((b) => (b as { text: string }).text)
-      .join("");
-  }
-  return openaiChat(
-    [{ role: "system", content: opts.system }, ...opts.messages],
-    { maxTokens }
-  );
-}
-
-/** Streaming chat — yields text deltas regardless of backend. */
 export async function* streamReply(opts: {
   system: string;
   messages: { role: "user" | "assistant"; content: string }[];
   maxTokens?: number;
+  modelId?: string | null;
 }): AsyncGenerator<string> {
+  const m = pick(opts.modelId);
   const maxTokens = opts.maxTokens ?? 4000;
-  if (aiProvider() === "anthropic") {
-    const client = anthropic();
-    const stream = client.messages.stream({
-      model: MODEL(),
+
+  if (m.provider === "anthropic") {
+    const stream = anthropic().messages.stream({
+      model: m.model,
       max_tokens: maxTokens,
       system: opts.system,
       messages: opts.messages as Anthropic.MessageParam[],
@@ -257,42 +265,37 @@ export async function* streamReply(opts: {
     }
     const final = await stream.finalMessage();
     if (final.stop_reason === "refusal" || final.content.length === 0) {
-      // Signal an empty/refused reply to the caller via a thrown marker.
       throw new RefusalError();
     }
     return;
   }
+
   yield* openaiStream(
+    m,
     [{ role: "system", content: opts.system }, ...opts.messages],
     { maxTokens }
   );
 }
 
-export class RefusalError extends Error {
-  refusal = true;
-  constructor() {
-    super("The AI declined to answer.");
-  }
-}
-
-/** Extract text/content from an image (OCR). Throws if vision unavailable. */
+/** Extract text/content from an image (OCR). Throws if the model lacks vision. */
 export async function visionExtract(
   data: Buffer,
   mediaType: string,
-  prompt: string
+  prompt: string,
+  modelId?: string | null
 ): Promise<string> {
-  if (!visionConfigured()) {
+  const m = pick(modelId);
+  if (!m.visionModel) {
     throw new Error(
-      "Image reading needs a vision-capable model. Configure ANTHROPIC_API_KEY, or set AI_VISION_MODEL to a vision model (e.g. glm-4.6v, qwen3-vl-plus)."
+      `The selected model (${m.label}) can't read images. Pick a vision-capable model in Settings.`
     );
   }
   const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
   const mt = allowed.includes(mediaType) ? mediaType : "image/png";
 
-  if (aiProvider() === "anthropic") {
-    const client = anthropic();
-    const stream = client.messages.stream({
-      model: MODEL(),
+  if (m.provider === "anthropic") {
+    const stream = anthropic().messages.stream({
+      model: m.visionModel,
       max_tokens: 8000,
       messages: [
         {
@@ -318,13 +321,11 @@ export async function visionExtract(
     const final = await stream.finalMessage();
     if (final.stop_reason === "refusal")
       throw new Error("The AI declined to process this image.");
-    return final.content
-      .filter((b) => b.type === "text")
-      .map((b) => (b as { text: string }).text)
-      .join("");
+    return anthropicText(final);
   }
 
   return openaiChat(
+    m,
     [
       {
         role: "user",
@@ -337,6 +338,6 @@ export async function visionExtract(
         ],
       },
     ],
-    { maxTokens: 8000, model: config.ai.openai.visionModel || undefined }
+    { maxTokens: 8000, model: m.visionModel }
   );
 }

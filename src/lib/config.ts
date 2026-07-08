@@ -12,21 +12,21 @@ export const config = {
   },
 
   /**
-   * AI provider selection. Defaults to Anthropic (Claude). To use a cheaper
-   * OpenAI-compatible provider (DeepSeek, Zhipu GLM, Qwen/DashScope, Kimi,
-   * MiniMax, OpenAI, Groq, …) set:
-   *   AI_PROVIDER=openai
-   *   AI_BASE_URL=https://api.deepseek.com          (provider's base URL)
-   *   AI_API_KEY=...                                (provider key)
-   *   AI_MODEL=deepseek-v4-flash                    (text model)
-   *   AI_VISION_MODEL=glm-4.6v                       (optional; enables image OCR)
-   * If AI_BASE_URL + AI_API_KEY are set, "openai" mode is auto-selected.
+   * AI models. Any model whose API key is present becomes selectable in
+   * Settings. Built-in options:
+   *   ANTHROPIC_API_KEY  → Claude (best quality; only one that reads scanned PDFs)
+   *   ZHIPU_API_KEY      → GLM-5.2 (cheap, vision via glm-4.6v-flash)
+   *   MINIMAX_API_KEY    → MiniMax-M3 (cheap, multimodal)
+   * Plus a generic OpenAI-compatible escape hatch (DeepSeek/Qwen/Kimi/OpenAI…):
+   *   AI_BASE_URL + AI_API_KEY + AI_MODEL (+ optional AI_VISION_MODEL)
+   * AI_DEFAULT_MODEL picks the default when several are configured.
    */
   ai: {
-    provider: (process.env.AI_PROVIDER ||
-      (process.env.AI_BASE_URL && process.env.AI_API_KEY
-        ? "openai"
-        : "anthropic")) as "anthropic" | "openai",
+    defaultModel: process.env.AI_DEFAULT_MODEL || "",
+    keys: {
+      zhipu: process.env.ZHIPU_API_KEY || "",
+      minimax: process.env.MINIMAX_API_KEY || "",
+    },
     openai: {
       apiKey: process.env.AI_API_KEY || "",
       baseUrl: (process.env.AI_BASE_URL || "").replace(/\/$/, ""),
@@ -69,24 +69,29 @@ export function appUrl(): string {
   return raw.replace(/\/$/, "");
 }
 
+/** True if at least one AI model is configured (any provider key present). */
 export function aiConfigured(): boolean {
-  if (config.ai.provider === "openai") {
-    return Boolean(config.ai.openai.apiKey && config.ai.openai.baseUrl && config.ai.openai.model);
-  }
-  return Boolean(config.anthropic.apiKey);
+  return Boolean(
+    config.anthropic.apiKey ||
+      config.ai.keys.zhipu ||
+      config.ai.keys.minimax ||
+      (config.ai.openai.apiKey && config.ai.openai.baseUrl && config.ai.openai.model)
+  );
 }
 
-/** Whether the configured provider can read images (OCR). */
+/** True if any configured model can read images (OCR). */
 export function visionConfigured(): boolean {
-  if (config.ai.provider === "openai") {
-    return Boolean(config.ai.openai.visionModel);
-  }
-  return Boolean(config.anthropic.apiKey);
+  return Boolean(
+    config.anthropic.apiKey ||
+      config.ai.keys.zhipu ||
+      config.ai.keys.minimax ||
+      config.ai.openai.visionModel
+  );
 }
 
-/** Whether the configured provider can read PDFs natively (Anthropic only). */
+/** Native scanned-PDF reading is Anthropic-only. */
 export function pdfAiConfigured(): boolean {
-  return config.ai.provider === "anthropic" && Boolean(config.anthropic.apiKey);
+  return Boolean(config.anthropic.apiKey);
 }
 
 export function sttConfigured(): boolean {

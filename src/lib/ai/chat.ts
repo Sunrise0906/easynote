@@ -36,12 +36,14 @@ ${context}`;
  */
 export function streamChatReply(
   note: Note,
-  history: { role: "user" | "assistant"; content: string }[]
+  history: { role: "user" | "assistant"; content: string }[],
+  modelId?: string | null
 ): AsyncGenerator<string> {
   return streamReply({
     system: chatSystem(note),
     messages: history,
     maxTokens: 4000,
+    modelId,
   });
 }
 

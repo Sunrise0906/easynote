@@ -101,6 +101,13 @@ export interface FolderData {
   createdAt: number;
 }
 
+export interface AiModelOption {
+  id: string;
+  label: string;
+  blurb: string;
+  vision: boolean;
+}
+
 export interface MeResponse {
   user: {
     id: string;
@@ -110,6 +117,7 @@ export interface MeResponse {
     planInterval?: "monthly" | "yearly";
     guest: boolean;
     createdAt: number;
+    modelId?: string | null;
   } | null;
   quota?: {
     plan: string;
@@ -123,8 +131,8 @@ export interface MeResponse {
     ai: boolean;
     stt: boolean;
     vision?: boolean;
-    provider?: "anthropic" | "openai";
-    model?: string;
+    models?: AiModelOption[];
+    activeModel?: string | null;
   };
 }
 

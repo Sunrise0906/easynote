@@ -5,6 +5,7 @@ import {
   Note,
   TranscriptSegment,
   getNote,
+  getUserById,
   updateNote,
   uploadsDir,
 } from "../store";
@@ -33,7 +34,10 @@ async function readMedia(note: Note): Promise<Buffer> {
  * Acquire the transcript for a note based on its source type.
  * Mutates nothing — returns the transcript data.
  */
-async function acquireTranscript(note: Note): Promise<{
+async function acquireTranscript(
+  note: Note,
+  modelId?: string | null
+): Promise<{
   segments: TranscriptSegment[];
   durationSec?: number;
   title?: string;
@@ -64,7 +68,11 @@ async function acquireTranscript(note: Note): Promise<{
     }
     case "image": {
       const data = await readMedia(note);
-      const text = await extractFromImage(data, note.mediaMime || "image/png");
+      const text = await extractFromImage(
+        data,
+        note.mediaMime || "image/png",
+        modelId
+      );
       if (!text.trim()) throw new Error("No readable content in this image.");
       return { segments: splitPlainText(text) };
     }
@@ -105,6 +113,8 @@ export function splitPlainText(text: string): TranscriptSegment[] {
 export async function processNote(noteId: string): Promise<void> {
   const note = await getNote(noteId);
   if (!note) return;
+  const owner = await getUserById(note.userId);
+  const modelId = owner?.modelId;
 
   try {
     /* -------- stage 1: transcript ------------------------------ */
@@ -125,7 +135,7 @@ export async function processNote(noteId: string): Promise<void> {
         error: undefined,
       });
     }
-    const acquired = await acquireTranscript(note);
+    const acquired = await acquireTranscript(note, modelId);
     if (acquired.segments.length === 0) {
       throw new Error("No content could be extracted from this source.");
     }
@@ -158,7 +168,7 @@ export async function processNote(noteId: string): Promise<void> {
 
     const fresh = await getNote(noteId);
     if (!fresh) return;
-    const generated = await generateNoteContent(fresh);
+    const generated = await generateNoteContent(fresh, modelId);
 
     await updateNote(noteId, (n) => {
       n.title =

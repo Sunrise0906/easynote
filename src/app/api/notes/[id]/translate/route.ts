@@ -54,7 +54,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   try {
-    const result = await translateNote(note, language);
+    const result = await translateNote(note, language, auth.user.modelId);
     const translation = {
       summary: result.summary,
       notesMarkdown: result.notesMarkdown,

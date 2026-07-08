@@ -104,6 +104,8 @@ export interface User {
   plan: PlanId;
   planInterval?: "monthly" | "yearly";
   planSince?: number;
+  /** Chosen AI model id (from the model catalog); undefined = default. */
+  modelId?: string;
   usage: UserUsage;
   createdAt: number;
 }

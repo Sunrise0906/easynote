@@ -46,6 +46,18 @@ export default function SettingsView() {
     }
   };
 
+  const chooseModel = async (modelId: string) => {
+    setBusy(`model:${modelId}`);
+    try {
+      await apiPost("/api/settings/model", { modelId });
+      await load();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Could not switch model.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const logoutEverywhere = async () => {
     try {
       await apiPost("/api/auth/logout");
@@ -162,31 +174,74 @@ export default function SettingsView() {
         </p>
       </section>
 
-      {/* AI configuration */}
+      {/* AI model picker */}
+      <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="font-bold text-slate-900">AI model</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Choose which model powers your notes, flashcards, quizzes, chat and
+          translation. Switch anytime — it applies to new generations.
+        </p>
+
+        {capabilities?.models && capabilities.models.length > 0 ? (
+          <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+            {capabilities.models.map((m) => {
+              const active = capabilities.activeModel === m.id;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => !active && chooseModel(m.id)}
+                  disabled={busy === `model:${m.id}`}
+                  className={`rounded-xl border-2 p-4 text-left transition ${
+                    active
+                      ? "border-brand-500 bg-brand-50"
+                      : "border-slate-200 hover:border-brand-300 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-900">
+                      {m.label}
+                    </span>
+                    {active && (
+                      <span className="flex items-center gap-1 text-xs font-bold text-brand-600">
+                        <BadgeCheck size={14} /> Active
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">
+                    {m.blurb}
+                  </p>
+                  <div className="mt-2 flex gap-1.5">
+                    <Tag>Text</Tag>
+                    {m.vision ? <Tag>Vision</Tag> : <Tag muted>No image OCR</Tag>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            No AI model is configured. Set <code>ANTHROPIC_API_KEY</code>,{" "}
+            <code>ZHIPU_API_KEY</code> or <code>MINIMAX_API_KEY</code> (or an{" "}
+            <code>AI_BASE_URL</code> provider) and restart the server.
+          </div>
+        )}
+      </section>
+
+      {/* AI capabilities */}
       <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="font-bold text-slate-900">AI services</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Configured by the server operator via <code>.env.local</code>.
+          Configured by the server operator via environment variables.
         </p>
         <div className="mt-4 space-y-3">
-          <ServiceRow
-            ok={Boolean(capabilities?.ai)}
-            icon={<KeyRound size={16} />}
-            title="Text AI (notes, flashcards, quiz, chat, translation)"
-            detail={
-              capabilities?.ai
-                ? `Active model: ${capabilities.model || "configured"} (${capabilities.provider === "openai" ? "OpenAI-compatible provider" : "Anthropic Claude"}).`
-                : "Set ANTHROPIC_API_KEY, or an AI_PROVIDER=openai config, and restart."
-            }
-          />
           <ServiceRow
             ok={Boolean(capabilities?.vision)}
             icon={<KeyRound size={16} />}
             title="Vision (read text from images)"
             detail={
               capabilities?.vision
-                ? "A vision-capable model is configured — image notes work."
-                : "Set a vision model (Claude, or AI_VISION_MODEL like glm-4.6v / qwen3-vl) to read images."
+                ? "A vision-capable model is available — image notes work."
+                : "Your selected model can't read images. Pick one tagged “Vision”."
             }
           />
           <ServiceRow
@@ -241,6 +296,24 @@ function UsageBar({
         />
       </div>
     </div>
+  );
+}
+
+function Tag({
+  children,
+  muted,
+}: {
+  children: React.ReactNode;
+  muted?: boolean;
+}) {
+  return (
+    <span
+      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+        muted ? "bg-slate-100 text-slate-400" : "bg-brand-100 text-brand-700"
+      }`}
+    >
+      {children}
+    </span>
   );
 }
 

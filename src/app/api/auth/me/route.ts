@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
 import { quotaInfo } from "@/lib/quota";
-import {
-  aiConfigured,
-  config,
-  sttConfigured,
-  visionConfigured,
-} from "@/lib/config";
+import { aiConfigured, sttConfigured, visionConfigured } from "@/lib/config";
+import { defaultModelId, publicModels } from "@/lib/ai/models";
 
 export async function GET() {
   const user = await currentUser();
   if (!user) return NextResponse.json({ user: null });
+  const models = publicModels();
+  const activeModel = user.modelId || defaultModelId() || null;
   return NextResponse.json({
     user: {
       id: user.id,
@@ -20,17 +18,15 @@ export async function GET() {
       planInterval: user.planInterval,
       guest: user.guest,
       createdAt: user.createdAt,
+      modelId: activeModel,
     },
     quota: quotaInfo(user),
     capabilities: {
       ai: aiConfigured(),
       stt: sttConfigured(),
       vision: visionConfigured(),
-      provider: config.ai.provider,
-      model:
-        config.ai.provider === "openai"
-          ? config.ai.openai.model
-          : config.anthropic.model,
+      models,
+      activeModel,
     },
   });
 }

@@ -73,7 +73,8 @@ const NOTE_SCHEMA = {
 } as const;
 
 export async function generateNoteContent(
-  note: Note
+  note: Note,
+  modelId?: string | null
 ): Promise<GeneratedNoteContent> {
   const system = `You are EasyNote, an expert note-taking assistant. You turn raw transcripts, documents and extracted text into clear, well-organized study notes.
 
@@ -91,12 +92,19 @@ Rules for notesMarkdown:
     note
   )}`;
 
-  return generateJSON<GeneratedNoteContent>({
+  const result = await generateJSON<GeneratedNoteContent>({
     system,
     user,
     schema: NOTE_SCHEMA as unknown as Record<string, unknown>,
     maxTokens: 30000,
+    modelId,
   });
+  // Guard against a model returning a parseable-but-empty object — surface it
+  // as a retryable error instead of persisting a blank "ready" note.
+  if (!result.notesMarkdown?.trim() || !result.summary?.trim()) {
+    throw new Error("The AI returned incomplete notes. Please try again.");
+  }
+  return result;
 }
 
 /* ------------------------------------------------------------------ */
@@ -125,7 +133,8 @@ const FLASHCARDS_SCHEMA = {
 
 export async function generateFlashcards(
   note: Note,
-  count: number
+  count: number,
+  modelId?: string | null
 ): Promise<Flashcard[]> {
   const system = `You create high-quality spaced-repetition flashcards from study material.
 - Each card tests exactly one fact or concept.
@@ -142,6 +151,7 @@ export async function generateFlashcards(
     user,
     schema: FLASHCARDS_SCHEMA as unknown as Record<string, unknown>,
     maxTokens: 10000,
+    modelId,
   });
   return result.cards.slice(0, count + 5);
 }
@@ -184,7 +194,8 @@ const QUIZ_SCHEMA = {
 
 export async function generateQuiz(
   note: Note,
-  count: number
+  count: number,
+  modelId?: string | null
 ): Promise<QuizQuestion[]> {
   const system = `You write multiple-choice quiz questions that test understanding of study material.
 - Exactly 4 options per question, with a single clearly-correct answer.
@@ -201,6 +212,7 @@ export async function generateQuiz(
     user,
     schema: QUIZ_SCHEMA as unknown as Record<string, unknown>,
     maxTokens: 12000,
+    modelId,
   });
   return result.questions
     .filter(
@@ -229,7 +241,8 @@ const TRANSLATION_SCHEMA = {
 
 export async function translateNote(
   note: Note,
-  targetLanguage: string
+  targetLanguage: string,
+  modelId?: string | null
 ): Promise<{ summary: string; notesMarkdown: string }> {
   const system = `You are a professional translator. Translate study notes into the requested language.
 - Preserve ALL Markdown structure exactly (headings, bullets, bold, tables).
@@ -251,6 +264,7 @@ ${truncateChars(note.notesMarkdown ?? "", MATERIAL_BUDGET)}`;
     user,
     schema: TRANSLATION_SCHEMA as unknown as Record<string, unknown>,
     maxTokens: 30000,
+    modelId,
   });
 }
 
@@ -262,7 +276,8 @@ const IMAGE_API_LIMIT = 5 * 1024 * 1024; // vision API byte limit
 
 export async function extractFromImage(
   data: Buffer,
-  mediaType: string
+  mediaType: string,
+  modelId?: string | null
 ): Promise<string> {
   if (data.length > IMAGE_API_LIMIT) {
     throw new Error(
@@ -272,7 +287,8 @@ export async function extractFromImage(
   return visionExtract(
     data,
     mediaType,
-    "Transcribe ALL text visible in this image (slides, whiteboard, handwriting, book page…), preserving structure. If the image contains diagrams or figures, describe them concisely in [brackets] where they appear. Output only the transcription/description — no commentary."
+    "Transcribe ALL text visible in this image (slides, whiteboard, handwriting, book page…), preserving structure. If the image contains diagrams or figures, describe them concisely in [brackets] where they appear. Output only the transcription/description — no commentary.",
+    modelId
   );
 }
 

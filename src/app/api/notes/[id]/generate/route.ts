@@ -41,24 +41,25 @@ export async function POST(req: NextRequest, { params }: Params) {
   } | null;
   const kind = body?.kind;
   const plan = PLANS[auth.user.plan];
+  const modelId = auth.user.modelId;
 
   try {
     if (kind === "flashcards") {
-      const cards = await generateFlashcards(note, plan.flashcardsPerNote);
+      const cards = await generateFlashcards(note, plan.flashcardsPerNote, modelId);
       const updated = await updateNote(id, (n) => {
         n.flashcards = cards;
       });
       return NextResponse.json({ flashcards: updated?.flashcards ?? cards });
     }
     if (kind === "quiz") {
-      const questions = await generateQuiz(note, plan.quizPerNote);
+      const questions = await generateQuiz(note, plan.quizPerNote, modelId);
       const updated = await updateNote(id, (n) => {
         n.quiz = questions;
       });
       return NextResponse.json({ quiz: updated?.quiz ?? questions });
     }
     if (kind === "notes") {
-      const generated = await generateNoteContent(note);
+      const generated = await generateNoteContent(note, modelId);
       const updated = await updateNote(id, (n) => {
         n.summary = generated.summary;
         n.keyPoints = generated.keyPoints;
