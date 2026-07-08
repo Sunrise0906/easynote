@@ -1,6 +1,6 @@
 import fsp from "fs/promises";
 import path from "path";
-import { aiConfigured, pdfAiConfigured } from "../config";
+import { aiConfigured, pdfAiConfigured, visionConfigured } from "../config";
 import {
   Note,
   TranscriptSegment,
@@ -14,7 +14,10 @@ import {
   extractFromPdfViaClaude,
   generateNoteContent,
 } from "../ai/generate";
-import { extractPdfText } from "./pdf";
+import { extractPdfText, renderPdfPages } from "./pdf";
+
+/** Max pages OCR'd from a scanned PDF (bounds cost & time). */
+const PDF_OCR_MAX_PAGES = Number(process.env.PDF_OCR_MAX_PAGES || 15);
 import { transcribeAudio } from "./audio";
 import { fetchYoutubeTranscript } from "./youtube";
 
@@ -56,15 +59,34 @@ async function acquireTranscript(
       const data = await readMedia(note);
       const { segments, totalChars } = await extractPdfText(data);
       if (totalChars >= 200) return { segments };
-      // Nearly no embedded text — probably a scanned PDF. Native PDF reading
-      // is Anthropic-only; other providers can't read scanned pages.
-      if (!pdfAiConfigured()) {
+      // Nearly no embedded text — a scanned PDF. Prefer native PDF reading when
+      // the selected model supports it (Claude); otherwise rasterize the pages
+      // and OCR them with the vision model (works on MiniMax/GLM/etc.).
+      if (pdfAiConfigured()) {
+        const text = await extractFromPdfViaClaude(data);
+        return { segments: splitPlainText(text) };
+      }
+      if (!visionConfigured()) {
         throw new Error(
-          "This PDF appears to be scanned (no selectable text). Native PDF reading requires the Anthropic provider — set ANTHROPIC_API_KEY, or upload a PDF that has real text."
+          "This PDF appears to be scanned (no selectable text). Reading it needs a vision-capable model — pick one tagged “Vision” in Settings, or upload a PDF that has real text."
         );
       }
-      const text = await extractFromPdfViaClaude(data);
-      return { segments: splitPlainText(text) };
+      const { pages, truncated } = await renderPdfPages(data, PDF_OCR_MAX_PAGES);
+      const ocr: TranscriptSegment[] = [];
+      for (let i = 0; i < pages.length; i++) {
+        const text = await extractFromImage(pages[i], "image/png", modelId);
+        if (text.trim()) ocr.push({ start: i + 1, text: text.trim() });
+      }
+      if (ocr.length === 0) {
+        throw new Error("Couldn't read any text from this scanned PDF.");
+      }
+      if (truncated) {
+        ocr.push({
+          start: ocr.length + 1,
+          text: `[Only the first ${PDF_OCR_MAX_PAGES} pages were read from this scanned PDF.]`,
+        });
+      }
+      return { segments: ocr };
     }
     case "image": {
       const data = await readMedia(note);

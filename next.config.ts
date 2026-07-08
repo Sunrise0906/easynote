@@ -38,6 +38,13 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Native modules used for scanned-PDF rasterization. Keep them external and
+  // force their binaries into the standalone trace so the Docker image ships
+  // the (musl) canvas .node file.
+  serverExternalPackages: ["@napi-rs/canvas", "unpdf"],
+  outputFileTracingIncludes: {
+    "/**": ["./node_modules/@napi-rs/canvas/**"],
+  },
   redirects: async () => [
     {
       source: "/",
