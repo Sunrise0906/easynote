@@ -213,6 +213,10 @@ export async function generateJSON<T>(opts: {
       ? " Do not include any reasoning or <think> blocks — output only the JSON object."
       : "";
   const system = `${opts.system}\n\nRespond with a single valid JSON object and nothing else — no markdown, no commentary.${noThink} The JSON must conform to this schema:\n${JSON.stringify(opts.schema)}`;
+  // json_object mode makes MiniMax-class (inline-tag) models intermittently
+  // return empty content on large generations; they ignore the flag anyway
+  // and extractJson handles their <think>+fenced output, so skip it for them.
+  const jsonMode = m.think !== "inline-tag";
   // Reasoning models occasionally return empty content; retry a few times.
   let lastErr: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -222,7 +226,7 @@ export async function generateJSON<T>(opts: {
         { role: "system", content: system },
         { role: "user", content: opts.user },
       ],
-      { maxTokens, jsonMode: true }
+      { maxTokens, jsonMode }
     );
     if (text.trim().length === 0) {
       lastErr = new Error("The AI returned an empty response.");
