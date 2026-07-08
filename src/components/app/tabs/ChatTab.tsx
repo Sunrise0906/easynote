@@ -103,12 +103,12 @@ export default function ChatTab({
 
   if (!aiReady) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-        <MessageCircleQuestion className="mx-auto text-brand-400" size={36} />
-        <div className="mt-3 font-bold text-slate-800">
+      <div className="rounded-lg border border-dashed border-border bg-surface px-6 py-14 text-center">
+        <MessageCircleQuestion className="mx-auto text-primary" size={36} />
+        <div className="mt-3 font-display font-bold text-ink">
           Chat with this note
         </div>
-        <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-500">
+        <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted">
           Add ANTHROPIC_API_KEY to .env.local and restart the server to ask
           questions about this material.
         </p>
@@ -117,16 +117,16 @@ export default function ChatTab({
   }
 
   return (
-    <div className="flex h-[36rem] flex-col rounded-2xl border border-slate-200 bg-white">
+    <div className="flex h-[36rem] flex-col rounded-lg border border-border bg-surface">
       {/* messages */}
       <div className="thin-scroll flex-1 space-y-4 overflow-y-auto p-5">
         {messages.length === 0 && !streaming && (
           <div className="flex h-full flex-col items-center justify-center text-center">
-            <MessageCircleQuestion size={36} className="text-brand-300" />
-            <div className="mt-3 font-semibold text-slate-700">
+            <MessageCircleQuestion size={36} className="text-primary" />
+            <div className="mt-3 font-display font-semibold text-ink">
               Ask anything about “{note.title}”
             </div>
-            <p className="mt-1 max-w-xs text-xs leading-5 text-slate-400">
+            <p className="mt-1 max-w-xs text-xs leading-5 text-muted">
               Answers are grounded in this note&apos;s transcript and notes.
             </p>
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
@@ -134,7 +134,7 @@ export default function ChatTab({
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="rounded-xl border border-slate-200 px-3.5 py-2 text-left text-xs font-medium text-slate-600 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700"
+                  className="rounded-md border border-border px-3.5 py-2 text-left text-xs font-medium text-muted transition hover:border-primary hover:bg-primary/5 hover:text-primary"
                 >
                   {s}
                 </button>
@@ -146,13 +146,13 @@ export default function ChatTab({
         {messages.map((m, i) =>
           m.role === "user" ? (
             <div key={i} className="flex justify-end">
-              <div className="max-w-[85%] rounded-2xl rounded-br-md bg-brand-600 px-4 py-2.5 text-sm leading-6 text-white">
+              <div className="max-w-[85%] rounded-lg rounded-br-md bg-primary px-4 py-2.5 text-sm leading-6 text-primary-ink">
                 {m.content}
               </div>
             </div>
           ) : (
             <div key={i} className="flex justify-start">
-              <div className="max-w-[92%] rounded-2xl rounded-bl-md bg-slate-100 px-4 py-2.5 text-sm">
+              <div className="max-w-[92%] rounded-lg rounded-bl-md bg-surface-2 px-4 py-2.5 text-sm text-ink">
                 <Markdown>{m.content}</Markdown>
               </div>
             </div>
@@ -161,7 +161,7 @@ export default function ChatTab({
 
         {streaming && (
           <div className="flex justify-start">
-            <div className="max-w-[92%] rounded-2xl rounded-bl-md bg-slate-100 px-4 py-2.5 text-sm">
+            <div className="max-w-[92%] rounded-lg rounded-bl-md bg-surface-2 px-4 py-2.5 text-sm text-ink">
               {partial ? (
                 <Markdown>{partial}</Markdown>
               ) : (
@@ -178,7 +178,7 @@ export default function ChatTab({
       </div>
 
       {error && (
-        <div className="mx-5 mb-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs text-rose-700">
+        <div className="mx-5 mb-2 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2 text-xs text-red-600">
           {error}{" "}
           {error.includes("Upgrade") && (
             <a href="/price" className="font-semibold underline">
@@ -189,7 +189,7 @@ export default function ChatTab({
       )}
 
       {/* input */}
-      <div className="flex items-end gap-2 border-t border-slate-100 p-3.5">
+      <div className="flex items-end gap-2 border-t border-border p-3.5">
         {messages.length > 0 && (
           <Button
             variant="ghost"
@@ -211,7 +211,7 @@ export default function ChatTab({
           }}
           rows={1}
           placeholder="Ask about this note… (Enter to send)"
-          className="max-h-32 min-h-[42px] flex-1 resize-none rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
+          className="max-h-32 min-h-[42px] flex-1 resize-none rounded-md border border-border bg-surface-2 px-3.5 py-2.5 text-sm text-ink placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
         />
         <Button
           onClick={() => send(input)}
@@ -228,7 +228,7 @@ export default function ChatTab({
 function Dot({ delay }: { delay: string }) {
   return (
     <span
-      className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400"
+      className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted"
       style={{ animationDelay: delay }}
     />
   );

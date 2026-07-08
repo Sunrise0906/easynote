@@ -8,3 +8,8 @@ data
 .DS_Store
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# local tooling (design skills, preview config)
+.claude/
+.github/skills/
+PRODUCT.md.bak

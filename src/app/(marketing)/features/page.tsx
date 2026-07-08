@@ -17,13 +17,13 @@ import {
   NotebookPen,
   Share2,
   Sparkles,
-  CirclePlay,
+  PlayCircle,
 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Features",
   description:
-    "Everything EasyNote can do: live recording, file transcription, YouTube notes, PDF and image import, flashcards, quizzes, mind maps, chat, translation and more.",
+    "Everything Recall can do: live recording, file transcription, YouTube notes, PDF and image import, flashcards, quizzes, mind maps, chat, translation and more.",
 };
 
 const GROUPS: {
@@ -33,7 +33,7 @@ const GROUPS: {
 }[] = [
   {
     heading: "Capture from any source",
-    sub: "EasyNote meets your knowledge wherever it lives.",
+    sub: "Recall meets your knowledge wherever it lives.",
     items: [
       {
         icon: Mic,
@@ -46,9 +46,9 @@ const GROUPS: {
         desc: "Upload recordings (mp3, m4a, wav, mp4, mov…) and get an accurate, time-stamped transcript you can search and click through.",
       },
       {
-        icon: CirclePlay,
+        icon: PlayCircle,
         title: "YouTube video notes",
-        desc: "Paste any link. EasyNote pulls the transcript, keeps the video attached for playback, and writes complete notes.",
+        desc: "Paste any link. Recall pulls the transcript, keeps the video attached for playback, and writes complete notes.",
       },
       {
         icon: FileText,
@@ -146,32 +146,32 @@ export default function FeaturesPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="text-center">
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+        <h1 className="font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
           Every feature, built for learning
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-          EasyNote is a complete pipeline from raw information to lasting
+        <p className="mx-auto mt-4 max-w-2xl text-muted">
+          Recall is a complete pipeline from raw information to lasting
           understanding. Here&apos;s everything inside.
         </p>
       </div>
 
       {GROUPS.map((g) => (
         <section key={g.heading} className="mt-16">
-          <h2 className="text-2xl font-extrabold text-slate-900">
+          <h2 className="font-display text-2xl font-extrabold text-ink">
             {g.heading}
           </h2>
-          <p className="mt-1 text-slate-500">{g.sub}</p>
+          <p className="mt-1 text-muted">{g.sub}</p>
           <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {g.items.map((f) => (
               <div
                 key={f.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-brand-300 hover:shadow-md"
+                className="rounded-lg border border-border bg-surface p-6 transition hover:border-ink/25 hover:shadow-[var(--shadow-soft)]"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
                   <f.icon size={20} />
                 </div>
-                <div className="mt-3.5 font-bold text-slate-900">{f.title}</div>
-                <p className="mt-1.5 text-sm leading-6 text-slate-600">
+                <div className="mt-3.5 font-display font-bold text-ink">{f.title}</div>
+                <p className="mt-1.5 text-sm leading-6 text-muted">
                   {f.desc}
                 </p>
               </div>
@@ -180,17 +180,17 @@ export default function FeaturesPage() {
         </section>
       ))}
 
-      <div className="mt-20 rounded-3xl bg-slate-900 px-8 py-12 text-center">
-        <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
+      <div className="mt-20 rounded-xl border border-border bg-primary px-8 py-12 text-center">
+        <h2 className="font-display text-2xl font-extrabold text-primary-ink sm:text-3xl">
           Try every feature free
         </h2>
-        <p className="mx-auto mt-2 max-w-xl text-slate-300">
+        <p className="mx-auto mt-2 max-w-xl text-primary-ink/80">
           The Starter plan includes the full toolkit — 10 AI notes a month, no
           credit card.
         </p>
         <Link
           href="/login?mode=signup"
-          className="mt-6 inline-block rounded-xl bg-brand-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-brand-400"
+          className="mt-6 inline-block rounded-md bg-bg px-8 py-3 text-sm font-bold text-ink transition hover:opacity-90"
         >
           Start taking better notes
         </Link>

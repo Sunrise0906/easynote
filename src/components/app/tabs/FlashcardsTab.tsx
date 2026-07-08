@@ -57,18 +57,18 @@ export default function FlashcardsTab({
 
   if (cards.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-        <Brain className="mx-auto text-brand-400" size={36} />
-        <div className="mt-3 font-bold text-slate-800">
+      <div className="rounded-lg border border-dashed border-border bg-surface px-6 py-14 text-center">
+        <Brain className="mx-auto text-primary" size={36} />
+        <div className="mt-3 font-display font-bold text-ink">
           Turn this note into flashcards
         </div>
-        <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-500">
+        <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted">
           {aiReady
             ? "The AI writes a spaced-repetition deck from this note — one concept per card."
             : "Add ANTHROPIC_API_KEY to .env.local to unlock flashcard generation."}
         </p>
         {error && (
-          <div className="mx-auto mt-4 max-w-md rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+          <div className="mx-auto mt-4 max-w-md rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">
             {error}
           </div>
         )}
@@ -105,12 +105,12 @@ export default function FlashcardsTab({
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mb-4 flex items-center justify-between text-sm">
-        <div className="font-semibold text-slate-700">
+        <div className="font-semibold text-ink">
           Card {index + 1}{" "}
-          <span className="text-slate-400">/ {sequence.length}</span>
+          <span className="text-muted">/ {sequence.length}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+          <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600">
             {knownCount} known
           </span>
           <Button variant="ghost" onClick={shuffle} className="!px-2.5 !py-1.5" title="Shuffle deck">
@@ -131,9 +131,9 @@ export default function FlashcardsTab({
       </div>
 
       {/* progress */}
-      <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-slate-200">
+      <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-surface-2">
         <div
-          className="h-full rounded-full bg-brand-500 transition-all"
+          className="h-full rounded-full bg-primary transition-all"
           style={{ width: `${((index + 1) / sequence.length) * 100}%` }}
         />
       </div>
@@ -146,22 +146,22 @@ export default function FlashcardsTab({
         <div
           className={`preserve-3d relative h-full w-full transition-transform duration-500 ${flipped ? "rotate-y-180" : ""}`}
         >
-          <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-3xl border-2 border-brand-200 bg-white p-8 text-center shadow-lg">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-brand-400">
+          <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-lg border border-border bg-surface p-8 text-center shadow-[var(--shadow-soft)]">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted">
               Question
             </div>
-            <div className="mt-4 text-lg font-semibold leading-8 text-slate-900">
+            <div className="mt-4 text-lg font-semibold leading-8 text-ink">
               {current?.front}
             </div>
-            <div className="absolute bottom-5 text-xs text-slate-400">
+            <div className="absolute bottom-5 text-xs text-muted">
               Click to flip
             </div>
           </div>
-          <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-center justify-center overflow-y-auto rounded-3xl border-2 border-brand-500 bg-gradient-to-br from-brand-600 to-brand-800 p-8 text-center shadow-lg">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-brand-200">
+          <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col items-center justify-center overflow-y-auto rounded-lg border border-primary bg-primary p-8 text-center shadow-[var(--shadow-soft)]">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-primary-ink/70">
               Answer
             </div>
-            <div className="mt-4 text-base font-medium leading-7 text-white">
+            <div className="mt-4 text-base font-medium leading-7 text-primary-ink">
               {current?.back}
             </div>
           </div>
@@ -177,14 +177,14 @@ export default function FlashcardsTab({
           <Button
             variant="secondary"
             onClick={() => mark(false)}
-            className="!border-rose-200 !text-rose-600 hover:!bg-rose-50"
+            className="!border-red-500/40 !text-red-600 hover:!bg-red-500/10"
           >
             <ThumbsDown size={15} /> Still learning
           </Button>
           <Button
             variant="secondary"
             onClick={() => mark(true)}
-            className="!border-emerald-200 !text-emerald-700 hover:!bg-emerald-50"
+            className="!border-emerald-500/40 !text-emerald-600 hover:!bg-emerald-500/10"
           >
             <ThumbsUp size={15} /> Got it
           </Button>
@@ -194,7 +194,7 @@ export default function FlashcardsTab({
         </Button>
       </div>
       {error && (
-        <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+        <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">
           {error}
         </div>
       )}

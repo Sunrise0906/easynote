@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "../Logo";
+import ThemeSwitcher from "../ThemeSwitcher";
 
 const LINKS = [
   { href: "/features", label: "Features" },
@@ -25,7 +26,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/80 backdrop-blur-lg">
+    <header className="sticky top-0 z-40 border-b border-border bg-bg/85 backdrop-blur-lg">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Logo />
         <div className="hidden items-center gap-7 md:flex">
@@ -33,39 +34,40 @@ export default function Navbar() {
             <Link
               key={l.href}
               href={l.href}
-              className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+              className="text-sm font-medium text-muted transition hover:text-ink"
             >
               {l.label}
             </Link>
           ))}
         </div>
         <div className="hidden items-center gap-3 md:flex">
+          <ThemeSwitcher />
           {signedIn ? (
             <Link
               href="/notes"
-              className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-ink transition hover:opacity-90"
             >
-              Open dashboard
+              Open workspace
             </Link>
           ) : (
             <>
               <Link
                 href="/login"
-                className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+                className="text-sm font-medium text-muted transition hover:text-ink"
               >
                 Sign in
               </Link>
               <Link
                 href="/login?mode=signup"
-                className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+                className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-ink transition hover:opacity-90"
               >
-                Get started free
+                Start free
               </Link>
             </>
           )}
         </div>
         <button
-          className="rounded-lg p-2 text-slate-600 md:hidden"
+          className="rounded-md p-2 text-ink md:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
@@ -73,23 +75,26 @@ export default function Navbar() {
         </button>
       </nav>
       {open && (
-        <div className="border-t border-slate-100 bg-white px-4 py-4 md:hidden">
+        <div className="border-t border-border bg-surface px-4 py-4 md:hidden">
           <div className="flex flex-col gap-3">
             {LINKS.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="py-1 text-sm font-medium text-slate-700"
+                className="py-1 text-sm font-medium text-ink"
               >
                 {l.label}
               </Link>
             ))}
+            <div className="py-1">
+              <ThemeSwitcher align="left" />
+            </div>
             <Link
               href={signedIn ? "/notes" : "/login?mode=signup"}
-              className="mt-2 rounded-xl bg-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-white"
+              className="mt-1 rounded-md bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-ink"
             >
-              {signedIn ? "Open dashboard" : "Get started free"}
+              {signedIn ? "Open workspace" : "Start free"}
             </Link>
           </div>
         </div>

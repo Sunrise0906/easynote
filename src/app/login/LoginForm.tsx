@@ -57,10 +57,10 @@ export default function LoginForm() {
       <div className="flex w-full flex-col justify-center px-6 py-12 lg:w-1/2 lg:px-20">
         <div className="mx-auto w-full max-w-sm">
           <Logo />
-          <h1 className="mt-8 text-2xl font-extrabold text-slate-900">
+          <h1 className="mt-8 font-display text-2xl font-extrabold text-ink">
             {mode === "signup" ? "Create your account" : "Welcome back"}
           </h1>
-          <p className="mt-1.5 text-sm text-slate-500">
+          <p className="mt-1.5 text-sm text-muted">
             {mode === "signup"
               ? "Free forever. No credit card required."
               : "Sign in to your notes."}
@@ -115,10 +115,10 @@ export default function LoginForm() {
             </Button>
           </form>
 
-          <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
-            <div className="h-px flex-1 bg-slate-200" />
+          <div className="my-5 flex items-center gap-3 text-xs text-muted">
+            <div className="h-px flex-1 bg-border" />
             or
-            <div className="h-px flex-1 bg-slate-200" />
+            <div className="h-px flex-1 bg-border" />
           </div>
 
           <Button
@@ -131,12 +131,12 @@ export default function LoginForm() {
             Continue as guest
           </Button>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-muted">
             {mode === "signup" ? (
               <>
                 Already have an account?{" "}
                 <button
-                  className="font-semibold text-brand-600 hover:underline"
+                  className="font-semibold text-primary hover:underline"
                   onClick={() => setMode("signin")}
                 >
                   Sign in
@@ -144,9 +144,9 @@ export default function LoginForm() {
               </>
             ) : (
               <>
-                New to EasyNote?{" "}
+                New to Recall?{" "}
                 <button
-                  className="font-semibold text-brand-600 hover:underline"
+                  className="font-semibold text-primary hover:underline"
                   onClick={() => setMode("signup")}
                 >
                   Create an account
@@ -154,10 +154,10 @@ export default function LoginForm() {
               </>
             )}
           </p>
-          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-xs text-slate-500">
+          <div className="mt-6 rounded-lg border border-border bg-surface-2 px-4 py-3 text-center text-xs text-muted">
             Want a look around? Demo account:{" "}
             <button
-              className="font-mono font-semibold text-brand-600 hover:underline"
+              className="font-mono font-semibold text-primary hover:underline"
               onClick={() => {
                 setMode("signin");
                 setEmail("demo@easynote.local");
@@ -167,7 +167,7 @@ export default function LoginForm() {
               demo@easynote.local / demo1234
             </button>
           </div>
-          <p className="mt-6 text-center text-xs text-slate-400">
+          <p className="mt-6 text-center text-xs text-muted">
             By continuing you agree to our{" "}
             <Link href="/terms" className="underline">
               Terms
@@ -182,9 +182,9 @@ export default function LoginForm() {
       </div>
 
       {/* right: showcase */}
-      <div className="hidden bg-gradient-to-br from-brand-700 via-brand-600 to-fuchsia-600 lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:px-16">
-        <div className="max-w-md text-white">
-          <div className="text-3xl font-extrabold leading-snug">
+      <div className="hidden bg-primary lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:px-16">
+        <div className="max-w-md text-primary-ink">
+          <div className="font-display text-3xl font-extrabold leading-snug">
             “The fastest way to turn an hour of lecture into ten minutes of
             review.”
           </div>
@@ -195,10 +195,10 @@ export default function LoginForm() {
               "Study with flashcards, quizzes & AI chat",
             ].map((s, i) => (
               <div key={s} className="flex items-center gap-3">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-sm font-bold">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-ink/20 text-sm font-bold">
                   {i + 1}
                 </span>
-                <span className="text-brand-50">{s}</span>
+                <span className="text-primary-ink/80">{s}</span>
               </div>
             ))}
           </div>

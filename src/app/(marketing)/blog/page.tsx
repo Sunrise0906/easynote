@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 export default function BlogIndexPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
-        The EasyNote blog
+      <h1 className="font-display text-4xl font-extrabold tracking-tight text-ink">
+        The Recall blog
       </h1>
-      <p className="mt-3 text-slate-600">
+      <p className="mt-3 text-muted">
         Practical ideas on learning faster and remembering longer.
       </p>
       <div className="mt-10 space-y-5">
@@ -21,16 +21,16 @@ export default function BlogIndexPage() {
           <Link
             key={p.slug}
             href={`/blog/${p.slug}`}
-            className="block rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-brand-300 hover:shadow-md"
+            className="block rounded-lg border border-border bg-surface p-6 transition hover:border-ink/25 hover:shadow-[var(--shadow-soft)]"
           >
             <div className="flex items-start gap-4">
               <div className="text-3xl">{p.emoji}</div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">{p.title}</h2>
-                <p className="mt-1.5 text-sm leading-6 text-slate-600">
+                <h2 className="font-display text-lg font-bold text-ink">{p.title}</h2>
+                <p className="mt-1.5 text-sm leading-6 text-muted">
                   {p.excerpt}
                 </p>
-                <div className="mt-3 text-xs text-slate-400">
+                <div className="mt-3 text-xs text-muted">
                   {new Date(p.date).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",

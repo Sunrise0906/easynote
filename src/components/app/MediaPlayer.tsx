@@ -49,7 +49,7 @@ export default function MediaPlayer({
 
   if (note.youtubeId) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-black">
+      <div className="overflow-hidden rounded-lg border border-border bg-black">
         <div className="relative aspect-video w-full">
           <iframe
             ref={iframeRef}
@@ -66,7 +66,7 @@ export default function MediaPlayer({
 
   if (note.mediaFile && (note.sourceType === "audio" || note.sourceType === "recording")) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="rounded-lg border border-border bg-surface p-4">
         <audio
           ref={(el) => {
             mediaRef.current = el;
@@ -82,7 +82,7 @@ export default function MediaPlayer({
 
   if (note.mediaFile && note.sourceType === "video") {
     return (
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-black">
+      <div className="overflow-hidden rounded-lg border border-border bg-black">
         <video
           ref={(el) => {
             mediaRef.current = el;
@@ -98,7 +98,7 @@ export default function MediaPlayer({
 
   if (note.mediaFile && note.sourceType === "image") {
     return (
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-3">
+      <div className="overflow-hidden rounded-lg border border-border bg-surface p-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`/api/notes/${note.id}/media`}

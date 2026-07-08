@@ -58,13 +58,13 @@ export default function TranscriptTab({
         <div className="relative w-full max-w-xs">
           <Search
             size={15}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
           />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search transcript…"
-            className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-brand-400 focus:outline-none"
+            className="w-full rounded-md border border-border bg-surface py-2 pl-9 pr-3 text-sm text-ink placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
         <Button variant="ghost" onClick={copyAll} className="!px-3 !py-1.5">
@@ -74,21 +74,21 @@ export default function TranscriptTab({
       </div>
 
       {canSeek && (
-        <p className="mb-3 text-xs text-slate-400">
+        <p className="mb-3 text-xs text-muted">
           Tip: click a timestamp to jump to that moment.
         </p>
       )}
 
-      <div className="space-y-1 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
+      <div className="space-y-1 rounded-lg border border-border bg-surface p-4 sm:p-6">
         {segments.length === 0 && (
-          <div className="py-8 text-center text-sm text-slate-400">
+          <div className="py-8 text-center text-sm text-muted">
             No matches for “{query}”.
           </div>
         )}
         {segments.map((s, i) => (
           <div
             key={i}
-            className="group flex gap-4 rounded-xl px-2 py-2 transition hover:bg-brand-50/60"
+            className="group flex gap-4 rounded-md px-2 py-2 transition hover:bg-surface-2"
           >
             {(isTimed || isPdf) && (
               <button
@@ -96,15 +96,15 @@ export default function TranscriptTab({
                 disabled={!canSeek}
                 className={`h-fit shrink-0 rounded-md px-1.5 py-0.5 font-mono text-[11px] font-semibold ${
                   canSeek
-                    ? "bg-brand-100 text-brand-700 transition hover:bg-brand-600 hover:text-white"
-                    : "bg-slate-100 text-slate-500"
+                    ? "bg-primary/10 text-primary transition hover:bg-primary hover:text-primary-ink"
+                    : "bg-surface-2 text-muted"
                 }`}
                 title={canSeek ? "Jump to this moment" : undefined}
               >
                 {isPdf ? `p.${s.start}` : clock(s.start)}
               </button>
             )}
-            <p className="text-[15px] leading-7 text-slate-700">{s.text}</p>
+            <p className="text-[15px] leading-7 text-ink">{s.text}</p>
           </div>
         ))}
       </div>

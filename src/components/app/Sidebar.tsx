@@ -113,12 +113,12 @@ export default function Sidebar() {
         />
 
         <div className="mt-6 flex items-center justify-between px-3">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted">
             Folders
           </span>
           <button
             onClick={() => setNewFolderOpen(true)}
-            className="rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-brand-600"
+            className="rounded-md p-1 text-muted transition hover:bg-surface-2 hover:text-primary"
             title="New folder"
           >
             <FolderPlus size={15} />
@@ -126,7 +126,7 @@ export default function Sidebar() {
         </div>
         <div className="mt-1.5 space-y-0.5">
           {folders.length === 0 && (
-            <div className="px-3 py-1.5 text-xs text-slate-400">
+            <div className="px-3 py-1.5 text-xs text-muted">
               No folders yet
             </div>
           )}
@@ -140,7 +140,7 @@ export default function Sidebar() {
               />
               <button
                 onClick={() => removeFolder(f.id, f.name)}
-                className="absolute right-2 top-1/2 hidden -translate-y-1/2 rounded p-1 text-slate-300 hover:text-rose-500 group-hover:block"
+                className="absolute right-2 top-1/2 hidden -translate-y-1/2 rounded p-1 text-muted hover:text-red-500 group-hover:block"
                 title="Delete folder"
               >
                 <Trash2 size={13} />
@@ -150,11 +150,11 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      <div className="space-y-3 border-t border-slate-100 p-4">
+      <div className="space-y-3 border-t border-border p-4">
         {aiReady === false && (
           <Link
             href="/settings"
-            className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-800"
+            className="flex items-start gap-2 rounded-lg border border-accent/40 bg-accent/10 p-3 text-xs leading-5 text-ink"
           >
             <CircleAlert size={15} className="mt-0.5 shrink-0" />
             <span>
@@ -165,16 +165,16 @@ export default function Sidebar() {
         )}
 
         {quota && me?.user?.plan === "free" && (
-          <div className="rounded-xl bg-slate-100 p-3">
-            <div className="flex justify-between text-xs font-medium text-slate-600">
+          <div className="rounded-lg bg-surface-2 p-3">
+            <div className="flex justify-between text-xs font-medium text-muted">
               <span>Notes this month</span>
               <span>
                 {quota.notesUsed}/{quota.notesLimit}
               </span>
             </div>
-            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-200">
+            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-border">
               <div
-                className="h-full rounded-full bg-brand-500"
+                className="h-full rounded-full bg-primary"
                 style={{
                   width: `${Math.min(100, (quota.notesUsed / quota.notesLimit) * 100)}%`,
                 }}
@@ -182,7 +182,7 @@ export default function Sidebar() {
             </div>
             <Link
               href="/price"
-              className="mt-2.5 flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-fuchsia-600 px-3 py-1.5 text-xs font-bold text-white"
+              className="mt-2.5 flex items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-primary-ink"
             >
               <Crown size={13} /> Upgrade to Pro
             </Link>
@@ -191,21 +191,21 @@ export default function Sidebar() {
 
         {me?.user && (
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
               {me.user.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-semibold text-slate-800">
+              <div className="truncate text-sm font-semibold text-ink">
                 {me.user.name}
               </div>
-              <div className="truncate text-[11px] text-slate-400">
+              <div className="truncate text-[11px] text-muted">
                 {me.user.plan === "pro" ? "Pro plan" : "Starter plan"}
                 {me.user.guest ? " · guest" : ""}
               </div>
             </div>
             <button
               onClick={logout}
-              className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+              className="rounded-md p-1.5 text-muted transition hover:bg-surface-2 hover:text-ink"
               title="Sign out"
             >
               <LogOut size={16} />
@@ -219,11 +219,11 @@ export default function Sidebar() {
   return (
     <>
       {/* mobile top bar */}
-      <div className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden">
+      <div className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface px-4 md:hidden">
         <Logo href="/notes" size={26} />
         <button
           onClick={() => setOpen(true)}
-          className="rounded-lg p-2 text-slate-600"
+          className="rounded-md p-2 text-muted"
           aria-label="Open menu"
         >
           <Menu size={20} />
@@ -233,13 +233,13 @@ export default function Sidebar() {
       {open && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div
-            className="absolute inset-0 bg-slate-900/40"
+            className="absolute inset-0 bg-black/50"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-2xl">
+          <div className="absolute left-0 top-0 h-full w-72 bg-surface shadow-[var(--shadow-soft)]">
             <button
               onClick={() => setOpen(false)}
-              className="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400"
+              className="absolute right-3 top-3 rounded-md p-1.5 text-muted"
               aria-label="Close menu"
             >
               <X size={18} />
@@ -249,7 +249,7 @@ export default function Sidebar() {
         </div>
       )}
       {/* desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-slate-200 bg-white md:block">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-border bg-surface md:block">
         {nav}
       </aside>
       {/* spacer for mobile top bar */}
@@ -299,10 +299,10 @@ function SidebarLink({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition ${
+      className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition ${
         active
-          ? "bg-brand-50 text-brand-700"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          ? "bg-primary/10 text-primary"
+          : "text-muted hover:bg-surface-2 hover:text-ink"
       }`}
     >
       {icon}

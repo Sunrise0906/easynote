@@ -53,26 +53,26 @@ export default function CheckoutHandler() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]">
+      <div className="w-full max-w-md rounded-lg border border-border bg-surface p-7 shadow-[var(--shadow-soft)]">
         <div className="flex items-start justify-between">
-          <h3 className="text-lg font-bold text-slate-900">
+          <h3 className="font-display text-lg font-bold text-ink">
             {state === "done" ? "Welcome to Pro! 🎉" : "Upgrade to Pro"}
           </h3>
-          <button onClick={close} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100">
+          <button onClick={close} className="rounded-md p-1 text-muted transition hover:bg-surface-2 hover:text-ink">
             <X size={18} />
           </button>
         </div>
 
         {state === "signin" && (
           <div className="mt-4">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-muted">
               Create a free account (or sign in) first, then come back to
               upgrade.
             </p>
             <a
               href={`/login?next=${encodeURIComponent(`/price?checkout=${interval}`)}`}
-              className="mt-5 block rounded-xl bg-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-700"
+              className="mt-5 block rounded-md bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-ink hover:opacity-90"
             >
               Sign in / create account
             </a>
@@ -81,19 +81,19 @@ export default function CheckoutHandler() {
 
         {(state === "confirm" || state === "working") && (
           <div className="mt-4">
-            <div className="rounded-xl bg-slate-50 p-4 text-sm">
+            <div className="rounded-md bg-surface-2 p-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-600">EasyNote Pro</span>
-                <span className="font-semibold text-slate-900">{price}</span>
+                <span className="text-muted">Recall Pro</span>
+                <span className="font-semibold text-ink">{price}</span>
               </div>
-              <div className="mt-1 text-xs text-slate-400">
+              <div className="mt-1 text-xs text-muted">
                 Demo checkout — no real payment is processed.
               </div>
             </div>
             <button
               onClick={confirm}
               disabled={state === "working"}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-ink hover:opacity-90 disabled:opacity-60"
             >
               {state === "working" && (
                 <Loader2 size={16} className="animate-spin" />
@@ -106,13 +106,13 @@ export default function CheckoutHandler() {
         {state === "done" && (
           <div className="mt-4 text-center">
             <BadgeCheck size={48} className="mx-auto text-emerald-500" />
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-muted">
               Your account now has unlimited notes, bigger decks and unlimited
               chat.
             </p>
             <a
               href="/notes"
-              className="mt-5 block rounded-xl bg-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-700"
+              className="mt-5 block rounded-md bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-ink hover:opacity-90"
             >
               Go to my notes
             </a>

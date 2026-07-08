@@ -58,16 +58,16 @@ export default function QuizTab({
 
   if (questions.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-        <ListChecks className="mx-auto text-brand-400" size={36} />
-        <div className="mt-3 font-bold text-slate-800">Quiz yourself</div>
-        <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-500">
+      <div className="rounded-lg border border-dashed border-border bg-surface px-6 py-14 text-center">
+        <ListChecks className="mx-auto text-primary" size={36} />
+        <div className="mt-3 font-display font-bold text-ink">Quiz yourself</div>
+        <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted">
           {aiReady
             ? "Multiple-choice questions with explanations, generated from this note."
             : "Add ANTHROPIC_API_KEY to .env.local to unlock quiz generation."}
         </p>
         {error && (
-          <div className="mx-auto mt-4 max-w-md rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+          <div className="mx-auto mt-4 max-w-md rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">
             {error}
           </div>
         )}
@@ -84,24 +84,24 @@ export default function QuizTab({
     const score = answers.filter(Boolean).length;
     const pct = Math.round((score / questions.length) * 100);
     return (
-      <div className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white px-8 py-12 text-center">
+      <div className="mx-auto max-w-md rounded-lg border border-border bg-surface px-8 py-12 text-center">
         <Trophy
           size={48}
-          className={`mx-auto ${pct >= 80 ? "text-amber-400" : "text-slate-300"}`}
+          className={`mx-auto ${pct >= 80 ? "text-accent" : "text-faint"}`}
         />
-        <div className="mt-4 text-3xl font-extrabold text-slate-900">
+        <div className="mt-4 font-display text-3xl font-extrabold text-ink">
           {score} / {questions.length}
         </div>
-        <div className="mt-1 text-sm text-slate-500">
+        <div className="mt-1 text-sm text-muted">
           {pct >= 80
             ? "Excellent — you know this material!"
             : pct >= 50
               ? "Good progress. Review the explanations and go again."
               : "Worth another pass through the notes before retrying."}
         </div>
-        <div className="mx-auto mt-5 h-2.5 max-w-xs overflow-hidden rounded-full bg-slate-100">
+        <div className="mx-auto mt-5 h-2.5 max-w-xs overflow-hidden rounded-full bg-surface-2">
           <div
-            className={`h-full rounded-full ${pct >= 80 ? "bg-emerald-500" : pct >= 50 ? "bg-amber-400" : "bg-rose-400"}`}
+            className={`h-full rounded-full ${pct >= 80 ? "bg-emerald-500" : pct >= 50 ? "bg-accent" : "bg-red-500"}`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -124,23 +124,23 @@ export default function QuizTab({
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mb-4 flex items-center justify-between text-sm">
-        <div className="font-semibold text-slate-700">
+        <div className="font-semibold text-ink">
           Question {index + 1}{" "}
-          <span className="text-slate-400">/ {questions.length}</span>
+          <span className="text-muted">/ {questions.length}</span>
         </div>
-        <div className="text-xs text-slate-400">
+        <div className="text-xs text-muted">
           {answers.filter(Boolean).length} correct so far
         </div>
       </div>
-      <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-slate-200">
+      <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-surface-2">
         <div
-          className="h-full rounded-full bg-brand-500 transition-all"
+          className="h-full rounded-full bg-primary transition-all"
           style={{ width: `${(index / questions.length) * 100}%` }}
         />
       </div>
 
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
-        <div className="text-lg font-bold leading-8 text-slate-900">
+      <div className="rounded-lg border border-border bg-surface p-6 sm:p-8">
+        <div className="font-display text-lg font-bold leading-8 text-ink">
           {q?.question}
         </div>
         <div className="mt-5 space-y-2.5">
@@ -148,13 +148,13 @@ export default function QuizTab({
             const isCorrect = i === q.answerIndex;
             const isPicked = picked === i;
             let cls =
-              "border-slate-200 hover:border-brand-400 hover:bg-brand-50/50";
+              "border-border hover:border-primary hover:bg-primary/5";
             if (answered && isCorrect) {
-              cls = "border-emerald-400 bg-emerald-50";
+              cls = "border-emerald-500/60 bg-emerald-500/10";
             } else if (answered && isPicked && !isCorrect) {
-              cls = "border-rose-400 bg-rose-50";
+              cls = "border-red-500/60 bg-red-500/10";
             } else if (answered) {
-              cls = "border-slate-200 opacity-60";
+              cls = "border-border opacity-60";
             }
             return (
               <button
@@ -164,15 +164,15 @@ export default function QuizTab({
                   setPicked(i);
                   setAnswers([...answers, i === q.answerIndex]);
                 }}
-                className={`flex w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left text-[15px] font-medium text-slate-800 transition ${cls}`}
+                className={`flex w-full items-center gap-3 rounded-md border-2 px-4 py-3 text-left text-[15px] font-medium text-ink transition ${cls}`}
               >
                 <span
                   className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                     answered && isCorrect
                       ? "bg-emerald-500 text-white"
                       : answered && isPicked && !isCorrect
-                        ? "bg-rose-500 text-white"
-                        : "bg-slate-100 text-slate-500"
+                        ? "bg-red-500 text-white"
+                        : "bg-surface-2 text-muted"
                   }`}
                 >
                   {answered && isCorrect ? (
@@ -191,10 +191,10 @@ export default function QuizTab({
 
         {answered && (
           <div
-            className={`mt-5 rounded-2xl p-4 text-sm leading-6 ${
+            className={`mt-5 rounded-md p-4 text-sm leading-6 ${
               picked === q?.answerIndex
-                ? "bg-emerald-50 text-emerald-800"
-                : "bg-amber-50 text-amber-800"
+                ? "bg-emerald-500/10 text-emerald-600"
+                : "bg-accent/10 text-ink"
             }`}
           >
             <span className="font-bold">
@@ -222,7 +222,7 @@ export default function QuizTab({
         )}
       </div>
       {error && (
-        <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+        <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">
           {error}
         </div>
       )}

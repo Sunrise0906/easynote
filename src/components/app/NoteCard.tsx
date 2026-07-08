@@ -87,43 +87,43 @@ export default function NoteCard({
   };
 
   return (
-    <div className="group relative rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-brand-300 hover:shadow-md">
+    <div className="group relative rounded-lg border border-border bg-surface p-5 transition hover:border-primary/40 hover:shadow-[var(--shadow-soft)]">
       <Link href={`/notes/${note.id}`} className="block">
         <div className="flex items-start justify-between gap-2">
           <div className="text-2xl">{note.emoji}</div>
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+          <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted">
             {SOURCE_LABEL[note.sourceType]}
           </span>
         </div>
-        <div className="mt-2.5 line-clamp-2 font-bold leading-snug text-slate-900">
+        <div className="mt-2.5 line-clamp-2 font-display font-bold leading-snug text-ink">
           {note.title}
         </div>
 
         {processing ? (
           <div className="mt-3">
-            <div className="flex items-center gap-2 text-xs font-medium text-brand-600">
+            <div className="flex items-center gap-2 text-xs font-medium text-primary">
               <Loader2 size={13} className="animate-spin" />
               {note.statusMessage || "Processing…"}
             </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
               <div
-                className="h-full rounded-full bg-brand-500 transition-all"
+                className="h-full rounded-full bg-primary transition-all"
                 style={{ width: `${note.progress}%` }}
               />
             </div>
           </div>
         ) : note.status === "error" ? (
-          <div className="mt-3 flex items-start gap-1.5 text-xs text-rose-600">
+          <div className="mt-3 flex items-start gap-1.5 text-xs text-red-600">
             <CircleAlert size={13} className="mt-0.5 shrink-0" />
             <span className="line-clamp-2">{note.error}</span>
           </div>
         ) : (
-          <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">
+          <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">
             {note.summary || "Transcript ready."}
           </p>
         )}
 
-        <div className="mt-3 text-[11px] text-slate-400">
+        <div className="mt-3 text-[11px] text-muted">
           {timeAgo(note.updatedAt)}
         </div>
       </Link>
@@ -132,7 +132,7 @@ export default function NoteCard({
       <div className="absolute bottom-4 right-4">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="rounded-lg p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-600 group-hover:text-slate-400"
+          className="rounded-md p-1.5 text-muted transition hover:bg-surface-2 hover:text-ink group-hover:text-muted"
           aria-label="Note menu"
         >
           <MoreHorizontal size={18} />
@@ -143,7 +143,7 @@ export default function NoteCard({
               className="fixed inset-0 z-10"
               onClick={() => setMenuOpen(false)}
             />
-            <div className="absolute bottom-9 right-0 z-20 w-44 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+            <div className="absolute bottom-9 right-0 z-20 w-44 overflow-hidden rounded-lg border border-border bg-surface py-1 shadow-[var(--shadow-soft)]">
               <MenuItem
                 icon={<Pencil size={14} />}
                 label="Rename"
@@ -209,7 +209,7 @@ export default function NoteCard({
         <div className="space-y-1.5">
           <button
             onClick={() => move(null)}
-            className={`w-full rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition hover:border-brand-400 ${!note.folderId ? "border-brand-500 bg-brand-50 text-brand-700" : "border-slate-200 text-slate-700"}`}
+            className={`w-full rounded-md border px-4 py-2.5 text-left text-sm font-medium transition hover:border-primary ${!note.folderId ? "border-primary bg-primary/10 text-primary" : "border-border text-ink"}`}
           >
             🗂️ All notes (no folder)
           </button>
@@ -217,13 +217,13 @@ export default function NoteCard({
             <button
               key={f.id}
               onClick={() => move(f.id)}
-              className={`w-full rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition hover:border-brand-400 ${note.folderId === f.id ? "border-brand-500 bg-brand-50 text-brand-700" : "border-slate-200 text-slate-700"}`}
+              className={`w-full rounded-md border px-4 py-2.5 text-left text-sm font-medium transition hover:border-primary ${note.folderId === f.id ? "border-primary bg-primary/10 text-primary" : "border-border text-ink"}`}
             >
               📁 {f.name}
             </button>
           ))}
           {folders.length === 0 && (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted">
               No folders yet — create one from the sidebar.
             </p>
           )}
@@ -235,7 +235,7 @@ export default function NoteCard({
         onClose={() => setDeleteOpen(false)}
         title="Delete note?"
       >
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted">
           “{note.title}” and its transcript, flashcards, quiz and chat history
           will be permanently deleted.
         </p>
@@ -266,7 +266,7 @@ function MenuItem({
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center gap-2.5 px-3.5 py-2 text-sm font-medium transition hover:bg-slate-50 ${danger ? "text-rose-600" : "text-slate-700"}`}
+      className={`flex w-full items-center gap-2.5 px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2 ${danger ? "text-red-600" : "text-ink"}`}
     >
       {icon}
       {label}

@@ -3,7 +3,7 @@ import FAQList from "@/components/marketing/FAQList";
 
 export const metadata: Metadata = {
   title: "FAQ",
-  description: "Answers to common questions about EasyNote.",
+  description: "Answers to common questions about Recall.",
 };
 
 const SECTIONS: { id: string; title: string; items: { q: string; a: string }[] }[] = [
@@ -12,8 +12,8 @@ const SECTIONS: { id: string; title: string; items: { q: string; a: string }[] }
     title: "Most popular",
     items: [
       {
-        q: "What is EasyNote?",
-        a: "EasyNote is an AI note-taking assistant. Give it a live recording, an audio/video file, a YouTube link, a PDF, an image or pasted text, and it produces a transcript plus structured notes, a summary, key points, flashcards, quizzes, a mind map and a chat tutor grounded in that material.",
+        q: "What is Recall?",
+        a: "Recall is an AI note-taking assistant. Give it a live recording, an audio/video file, a YouTube link, a PDF, an image or pasted text, and it produces a transcript plus structured notes, a summary, key points, flashcards, quizzes, a mind map and a chat tutor grounded in that material.",
       },
       {
         q: "Which languages are supported?",
@@ -47,11 +47,11 @@ const SECTIONS: { id: string; title: string; items: { q: string; a: string }[] }
       },
       {
         q: "Why does my YouTube video fail to import?",
-        a: "EasyNote reads the video's captions. If a video has captions disabled, is private, or is region-locked, there's nothing to read — try another video or download the audio and upload it instead.",
+        a: "Recall reads the video's captions. If a video has captions disabled, is private, or is region-locked, there's nothing to read — try another video or download the audio and upload it instead.",
       },
       {
         q: "Do you support scanned PDFs?",
-        a: "Yes. If a PDF has no embedded text, EasyNote falls back to AI vision to read the pages, so scanned textbooks and handouts still work.",
+        a: "Yes. If a PDF has no embedded text, Recall falls back to AI vision to read the pages, so scanned textbooks and handouts still work.",
       },
       {
         q: "Can I jump from the notes back to the source?",
@@ -86,23 +86,23 @@ const SECTIONS: { id: string; title: string; items: { q: string; a: string }[] }
 export default function FAQPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-      <h1 className="text-center text-4xl font-extrabold tracking-tight text-slate-900">
+      <h1 className="font-display text-center text-4xl font-extrabold tracking-tight text-ink">
         How can we help?
       </h1>
-      <p className="mt-3 text-center text-slate-600">
+      <p className="mt-3 text-center text-muted">
         Quick answers about recording, importing, studying and billing.
       </p>
       {SECTIONS.map((s) => (
         <section key={s.id} id={s.id} className="mt-12 scroll-mt-24">
-          <h2 className="mb-4 text-xl font-bold text-slate-900">{s.title}</h2>
+          <h2 className="font-display mb-4 text-xl font-bold text-ink">{s.title}</h2>
           <FAQList items={s.items} />
         </section>
       ))}
-      <p className="mt-12 text-center text-sm text-slate-500">
+      <p className="mt-12 text-center text-sm text-muted">
         Still stuck? Write to{" "}
         <a
           href="mailto:support@easynote.local"
-          className="font-medium text-brand-600 hover:underline"
+          className="font-medium text-primary hover:underline"
         >
           support@easynote.local
         </a>

@@ -29,20 +29,20 @@ export default function ProcessSteps({
   return (
     <div className="mx-auto max-w-lg py-14 text-center">
       <div className="text-5xl">{note.emoji}</div>
-      <h2 className="mt-4 text-xl font-extrabold text-slate-900">
+      <h2 className="mt-4 font-display text-xl font-extrabold text-ink">
         {note.title}
       </h2>
-      <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-muted">
         {SOURCE_LABEL[note.sourceType]}
       </div>
 
       {note.status === "error" ? (
-        <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-6 text-left">
+        <div className="mt-8 rounded-lg border border-red-500/30 bg-red-500/10 p-6 text-left">
           <div className="flex items-start gap-3">
-            <CircleAlert className="mt-0.5 shrink-0 text-rose-500" size={20} />
+            <CircleAlert className="mt-0.5 shrink-0 text-red-500" size={20} />
             <div>
-              <div className="font-bold text-rose-800">Processing failed</div>
-              <p className="mt-1 text-sm leading-6 text-rose-700">
+              <div className="font-display font-bold text-red-600">Processing failed</div>
+              <p className="mt-1 text-sm leading-6 text-red-600">
                 {note.error}
               </p>
             </div>
@@ -62,12 +62,12 @@ export default function ProcessSteps({
               return (
                 <div
                   key={s.key}
-                  className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${
+                  className={`flex items-center gap-3 rounded-md border px-4 py-3 ${
                     active
-                      ? "border-brand-300 bg-brand-50"
+                      ? "border-primary/40 bg-primary/10"
                       : done
-                        ? "border-emerald-200 bg-emerald-50/60"
-                        : "border-slate-200 bg-white"
+                        ? "border-emerald-500/40 bg-emerald-500/10"
+                        : "border-border bg-surface"
                   }`}
                 >
                   <span
@@ -75,8 +75,8 @@ export default function ProcessSteps({
                       done
                         ? "bg-emerald-500 text-white"
                         : active
-                          ? "bg-brand-600 text-white"
-                          : "bg-slate-200 text-slate-500"
+                          ? "bg-primary text-primary-ink"
+                          : "bg-surface-2 text-muted"
                     }`}
                   >
                     {done ? (
@@ -89,12 +89,12 @@ export default function ProcessSteps({
                   </span>
                   <div>
                     <div
-                      className={`text-sm font-semibold ${active ? "text-brand-800" : done ? "text-emerald-800" : "text-slate-500"}`}
+                      className={`text-sm font-semibold ${active ? "text-primary" : done ? "text-emerald-600" : "text-muted"}`}
                     >
                       {s.label}
                     </div>
                     {active && note.statusMessage && (
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-muted">
                         {note.statusMessage}
                       </div>
                     )}
@@ -103,13 +103,13 @@ export default function ProcessSteps({
               );
             })}
           </div>
-          <div className="mx-auto mt-6 h-2 max-w-sm overflow-hidden rounded-full bg-slate-200">
+          <div className="mx-auto mt-6 h-2 max-w-sm overflow-hidden rounded-full bg-surface-2">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-brand-500 to-fuchsia-500 transition-all duration-700"
+              className="h-full rounded-full bg-primary transition-all duration-700"
               style={{ width: `${Math.max(8, note.progress)}%` }}
             />
           </div>
-          <p className="mt-4 text-xs text-slate-400">
+          <p className="mt-4 text-xs text-muted">
             This usually takes under a minute for links and text, longer for
             audio.
           </p>

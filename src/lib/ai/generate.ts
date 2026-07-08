@@ -76,7 +76,7 @@ export async function generateNoteContent(
   note: Note,
   modelId?: string | null
 ): Promise<GeneratedNoteContent> {
-  const system = `You are EasyNote, an expert note-taking assistant. You turn raw transcripts, documents and extracted text into clear, well-organized study notes.
+  const system = `You are Recall, an expert note-taking assistant. You turn raw transcripts, documents and extracted text into clear, well-organized study notes.
 
 Rules for notesMarkdown:
 - Write in the same language as the source content.

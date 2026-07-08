@@ -7,7 +7,7 @@ import CheckoutHandler from "./CheckoutHandler";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "EasyNote pricing: a generous free Starter plan, and Pro from $8.39/month for unlimited AI notes, flashcards, quizzes and chat.",
+    "Recall pricing: a generous free Starter plan, and Pro from $8.39/month for unlimited AI notes, flashcards, quizzes and chat.",
 };
 
 const PRICING_FAQ = [
@@ -29,7 +29,7 @@ const PRICING_FAQ = [
   },
   {
     q: "Is this demo really charging me?",
-    a: "No. This is a self-hosted build of EasyNote — the checkout instantly switches your local account between plans without any payment processing.",
+    a: "No. This is a self-hosted build of Recall — the checkout instantly switches your local account between plans without any payment processing.",
   },
 ];
 
@@ -37,10 +37,10 @@ export default function PricePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="text-center">
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+        <h1 className="font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
           Invest in how you learn
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-slate-600">
+        <p className="mx-auto mt-4 max-w-xl text-muted">
           One plan that&apos;s free forever, one that removes every limit.
         </p>
       </div>
@@ -51,7 +51,7 @@ export default function PricePage() {
         <CheckoutHandler />
       </Suspense>
       <div className="mx-auto mt-20 max-w-3xl">
-        <h2 className="text-center text-2xl font-extrabold text-slate-900">
+        <h2 className="font-display text-center text-2xl font-extrabold text-ink">
           Pricing questions
         </h2>
         <div className="mt-6" id="faq">

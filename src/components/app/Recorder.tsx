@@ -409,15 +409,15 @@ export default function Recorder() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8">
-      <h1 className="text-2xl font-extrabold text-slate-900">Live recording</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <h1 className="font-display text-2xl font-extrabold text-ink">Live recording</h1>
+      <p className="mt-1 text-sm text-muted">
         Speech is transcribed in your browser as you talk — the audio is saved
         with the note so you can replay any moment.
       </p>
 
       {!supported && (
-        <div className="mt-5 flex items-start gap-2.5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          <CircleAlert size={17} className="mt-0.5 shrink-0" />
+        <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm text-ink">
+          <CircleAlert size={17} className="mt-0.5 shrink-0 text-accent" />
           <span>
             This browser doesn&apos;t support live speech recognition. Use{" "}
             <strong>Chrome</strong> or <strong>Edge</strong>, or upload an
@@ -427,7 +427,7 @@ export default function Recorder() {
       )}
 
       {phase === "idle" && (
-        <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8">
+        <div className="mt-8 rounded-lg border border-border bg-surface p-8">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Note title (optional)">
               <input
@@ -455,12 +455,12 @@ export default function Recorder() {
             <button
               onClick={start}
               disabled={!supported}
-              className="animate-pulse-ring flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-xl transition hover:scale-105 disabled:opacity-40"
+              className="animate-pulse-ring flex h-24 w-24 items-center justify-center rounded-full bg-primary text-primary-ink shadow-[var(--shadow-soft)] transition hover:scale-105 disabled:opacity-40"
               aria-label="Start recording"
             >
               <Mic size={36} />
             </button>
-            <div className="mt-4 text-sm font-semibold text-slate-600">
+            <div className="mt-4 text-sm font-semibold text-muted">
               Tap to start recording
             </div>
           </div>
@@ -468,17 +468,17 @@ export default function Recorder() {
       )}
 
       {phase !== "idle" && (
-        <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
+        <div className="mt-8 rounded-lg border border-border bg-surface p-6 sm:p-8">
           {/* status row */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span
-                className={`h-3 w-3 rounded-full ${phase === "recording" ? "animate-pulse bg-rose-500" : "bg-amber-400"}`}
+                className={`h-3 w-3 rounded-full ${phase === "recording" ? "animate-pulse bg-accent" : "bg-muted"}`}
               />
-              <span className="font-mono text-2xl font-bold text-slate-900">
+              <span className="font-mono text-2xl font-bold text-ink">
                 {clock(elapsed)}
               </span>
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted">
                 {phase === "recording"
                   ? "Recording"
                   : phase === "paused"
@@ -493,7 +493,7 @@ export default function Recorder() {
               {[...Array(7)].map((_, i) => (
                 <span
                   key={i}
-                  className="w-1.5 rounded-full bg-brand-500 transition-all duration-100"
+                  className="w-1.5 rounded-full bg-primary transition-all duration-100"
                   style={{
                     height: `${
                       phase === "recording"
@@ -510,10 +510,10 @@ export default function Recorder() {
           {/* live transcript */}
           <div
             ref={scrollRef}
-            className="thin-scroll mt-6 h-64 overflow-y-auto rounded-2xl bg-slate-50 p-4"
+            className="thin-scroll mt-6 h-64 overflow-y-auto rounded-lg bg-surface-2 p-4"
           >
             {segments.length === 0 && !interim && (
-              <div className="flex h-full items-center justify-center text-sm text-slate-400">
+              <div className="flex h-full items-center justify-center text-sm text-muted">
                 {phase === "recording"
                   ? "Listening… start speaking"
                   : "Paused"}
@@ -521,15 +521,15 @@ export default function Recorder() {
             )}
             <div className="space-y-2.5">
               {segments.map((s, i) => (
-                <p key={i} className="text-[15px] leading-7 text-slate-700">
-                  <span className="mr-2 font-mono text-[11px] font-semibold text-brand-500">
+                <p key={i} className="text-[15px] leading-7 text-ink">
+                  <span className="mr-2 font-mono text-[11px] font-semibold text-primary">
                     {clock(Math.floor(s.start))}
                   </span>
                   {s.text}
                 </p>
               ))}
               {interim && (
-                <p className="text-[15px] leading-7 text-slate-400">
+                <p className="text-[15px] leading-7 text-muted">
                   {interim}
                 </p>
               )}
@@ -541,7 +541,7 @@ export default function Recorder() {
             {phase === "saveFailed" ? (
               <Button
                 onClick={saveRecording}
-                className="!bg-rose-600 !px-5 !py-2.5 hover:!bg-rose-700"
+                className="!px-5 !py-2.5"
               >
                 <Square size={16} /> Retry save
               </Button>
@@ -568,7 +568,7 @@ export default function Recorder() {
                   onClick={finish}
                   loading={phase === "saving"}
                   disabled={segments.length === 0 && phase !== "saving"}
-                  className="!bg-rose-600 !px-5 !py-2.5 hover:!bg-rose-700"
+                  className="!px-5 !py-2.5"
                 >
                   <Square size={16} /> Finish &amp; create note
                 </Button>
@@ -576,7 +576,7 @@ export default function Recorder() {
             )}
           </div>
           {segments.length === 0 && phase === "recording" && (
-            <p className="mt-3 text-center text-xs text-slate-400">
+            <p className="mt-3 text-center text-xs text-muted">
               The finish button unlocks once some speech has been transcribed.
             </p>
           )}
@@ -584,7 +584,7 @@ export default function Recorder() {
       )}
 
       {error && (
-        <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+        <div className="mt-4 rounded-lg border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm text-ink">
           {error}
         </div>
       )}

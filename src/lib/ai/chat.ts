@@ -19,7 +19,7 @@ function chatSystem(note: Note): string {
     .filter(Boolean)
     .join("\n");
 
-  return `You are EasyNote's study tutor. You answer questions about ONE specific note using its source content below.
+  return `You are Recall's study tutor. You answer questions about ONE specific note using its source content below.
 
 Guidelines:
 - Ground every answer in the note's content; quote or reference specific parts when helpful.

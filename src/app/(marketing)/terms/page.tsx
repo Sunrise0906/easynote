@@ -7,14 +7,14 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-      <h1 className="text-3xl font-extrabold text-slate-900">
+      <h1 className="font-display text-3xl font-extrabold text-ink">
         Terms of Service
       </h1>
-      <p className="mt-2 text-sm text-slate-400">Last updated: July 2026</p>
+      <p className="mt-2 text-sm text-muted">Last updated: July 2026</p>
       <div className="md-prose mt-8">
         <h2>1. The service</h2>
         <p>
-          EasyNote provides AI-assisted note-taking: it transcribes and
+          Recall provides AI-assisted note-taking: it transcribes and
           analyzes content you supply (recordings, files, links, images and
           text) and generates study materials such as notes, summaries,
           flashcards, quizzes, mind maps and chat responses. The service is
@@ -31,7 +31,7 @@ export default function TermsPage() {
         <h2>3. Your content</h2>
         <p>
           You keep all rights to the content you upload and to the notes
-          generated from it. You grant EasyNote only the processing rights
+          generated from it. You grant Recall only the processing rights
           needed to operate the service (transcription, AI analysis, storage,
           and display back to you). Content is private unless you create a
           share link.
@@ -46,7 +46,7 @@ export default function TermsPage() {
           </li>
           <li>
             Respect your institution&apos;s policies — including rules about
-            recording classes and academic integrity. EasyNote is a study aid,
+            recording classes and academic integrity. Recall is a study aid,
             not a way around honest work.
           </li>
           <li>
@@ -75,7 +75,7 @@ export default function TermsPage() {
         <h2>7. Disclaimer & liability</h2>
         <p>
           The service is provided “as is” without warranties of any kind. To
-          the maximum extent permitted by law, EasyNote is not liable for
+          the maximum extent permitted by law, Recall is not liable for
           indirect or consequential damages arising from use of the service.
         </p>
 

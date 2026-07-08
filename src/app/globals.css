@@ -1,20 +1,144 @@
 @import "tailwindcss";
 
-@theme {
-  --color-brand-50: #f4f1ff;
-  --color-brand-100: #ece5ff;
-  --color-brand-200: #dbceff;
-  --color-brand-300: #c0a7ff;
-  --color-brand-400: #a175ff;
-  --color-brand-500: #8546fb;
-  --color-brand-600: #7c22f3;
-  --color-brand-700: #6d15d8;
-  --color-brand-800: #5b13b1;
-  --color-brand-900: #4c1290;
-  --color-brand-950: #2e0662;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", sans-serif;
+/* ------------------------------------------------------------------ *
+ * Semantic token → Tailwind utility mapping (v4 @theme inline).
+ * Utilities like bg-bg, text-ink, bg-primary resolve the CSS vars at
+ * runtime, so switching [data-theme] restyles everything live.
+ * ------------------------------------------------------------------ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-ring: var(--ring);
+
+  --font-display: var(--font-display-family);
+  --font-sans: var(--font-body-family);
+  --font-mono: var(--font-mono-family);
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+}
+
+/* ---------------- Theme: Swiss (default) ---------------- */
+:root,
+:root[data-theme="swiss"] {
+  --bg: oklch(1 0 0);
+  --surface: oklch(0.976 0 0);
+  --surface-2: oklch(0.958 0 0);
+  --ink: oklch(0.2 0.012 256);
+  --muted: oklch(0.52 0.01 256);
+  --faint: oklch(0.92 0.004 256);
+  --border: oklch(0.9 0.005 256);
+  --primary: oklch(0.52 0.15 256);
+  --primary-ink: oklch(0.99 0 0);
+  --accent: oklch(0.55 0.16 28);
+  --accent-ink: oklch(0.99 0 0);
+  --ring: oklch(0.52 0.15 256 / 0.4);
+
+  --font-display-family: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-body-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono-family: var(--font-jetbrains), ui-monospace, monospace;
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --shadow-soft: 0 1px 2px oklch(0.2 0.02 256 / 0.05),
+    0 8px 24px oklch(0.2 0.02 256 / 0.06);
+}
+
+/* ---------------- Theme: Midnight ---------------- */
+:root[data-theme="midnight"] {
+  --bg: oklch(0.17 0.02 264);
+  --surface: oklch(0.215 0.022 264);
+  --surface-2: oklch(0.25 0.024 264);
+  --ink: oklch(0.94 0.006 264);
+  --muted: oklch(0.7 0.015 264);
+  --faint: oklch(0.32 0.02 264);
+  --border: oklch(0.3 0.02 264);
+  --primary: oklch(0.7 0.13 256);
+  --primary-ink: oklch(0.16 0.02 264);
+  --accent: oklch(0.8 0.11 85);
+  --accent-ink: oklch(0.18 0.02 85);
+  --ring: oklch(0.7 0.13 256 / 0.45);
+
+  --font-display-family: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-body-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono-family: var(--font-jetbrains), ui-monospace, monospace;
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.4), 0 12px 32px oklch(0 0 0 / 0.4);
+}
+
+/* ---------------- Theme: Editorial ---------------- */
+:root[data-theme="editorial"] {
+  --bg: oklch(0.985 0.003 95);
+  --surface: oklch(0.965 0.004 95);
+  --surface-2: oklch(0.95 0.005 95);
+  --ink: oklch(0.24 0.02 40);
+  --muted: oklch(0.5 0.02 40);
+  --faint: oklch(0.9 0.008 60);
+  --border: oklch(0.87 0.01 60);
+  --primary: oklch(0.42 0.13 25);
+  --primary-ink: oklch(0.98 0.006 90);
+  --accent: oklch(0.46 0.1 250);
+  --accent-ink: oklch(0.98 0 0);
+  --ring: oklch(0.42 0.13 25 / 0.4);
+
+  --font-display-family: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-body-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono-family: var(--font-jetbrains), ui-monospace, monospace;
+
+  --r-sm: 3px;
+  --r-md: 5px;
+  --r-lg: 8px;
+  --r-xl: 12px;
+  --shadow-soft: 0 1px 2px oklch(0.3 0.02 40 / 0.06),
+    0 10px 30px oklch(0.3 0.02 40 / 0.07);
+}
+
+/* ---------------- Theme: Botanic ---------------- */
+:root[data-theme="botanic"] {
+  --bg: oklch(0.99 0.004 140);
+  --surface: oklch(0.97 0.006 140);
+  --surface-2: oklch(0.955 0.008 140);
+  --ink: oklch(0.24 0.02 150);
+  --muted: oklch(0.48 0.02 150);
+  --faint: oklch(0.91 0.01 150);
+  --border: oklch(0.88 0.012 150);
+  --primary: oklch(0.42 0.09 150);
+  --primary-ink: oklch(0.98 0.01 140);
+  --accent: oklch(0.62 0.12 145);
+  --accent-ink: oklch(0.18 0.02 150);
+  --ring: oklch(0.42 0.09 150 / 0.4);
+
+  --font-display-family: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-body-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono-family: var(--font-jetbrains), ui-monospace, monospace;
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 26px;
+  --shadow-soft: 0 1px 2px oklch(0.3 0.03 150 / 0.05),
+    0 10px 28px oklch(0.3 0.03 150 / 0.07);
+}
+
+* {
+  border-color: var(--border);
 }
 
 html {
@@ -22,88 +146,150 @@ html {
 }
 
 body {
-  @apply bg-white text-slate-900 antialiased;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body-family);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 ::selection {
-  background: var(--color-brand-200);
+  background: var(--primary);
+  color: var(--primary-ink);
 }
 
-/* Thin scrollbars for panels */
+.font-display {
+  font-family: var(--font-display-family);
+  letter-spacing: -0.022em;
+}
+h1.font-display,
+h2.font-display,
+h3.font-display {
+  text-wrap: balance;
+}
+
 .thin-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--border) transparent;
 }
 .thin-scroll::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 .thin-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border);
   border-radius: 3px;
 }
 
-/* Markdown prose styling (hand-rolled, no typography plugin) */
+/* ---------------- Markdown prose (token-driven) ---------------- */
 .md-prose {
-  @apply text-[15px] leading-7 text-slate-700;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.md-prose h1,
+.md-prose h2,
+.md-prose h3,
+.md-prose h4 {
+  font-family: var(--font-display-family);
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 .md-prose h1 {
-  @apply mt-6 mb-3 text-2xl font-bold text-slate-900;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 1.4rem 0 0.75rem;
 }
 .md-prose h2 {
-  @apply mt-6 mb-2.5 text-xl font-bold text-slate-900;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.6rem;
 }
 .md-prose h3 {
-  @apply mt-5 mb-2 text-lg font-semibold text-slate-900;
-}
-.md-prose h4 {
-  @apply mt-4 mb-1.5 text-base font-semibold text-slate-900;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.2rem 0 0.5rem;
 }
 .md-prose p {
-  @apply my-2.5;
+  margin: 0.65rem 0;
+  max-width: 72ch;
 }
 .md-prose ul {
-  @apply my-2.5 list-disc pl-6 space-y-1;
+  margin: 0.65rem 0;
+  padding-left: 1.4rem;
+  list-style: disc;
 }
 .md-prose ol {
-  @apply my-2.5 list-decimal pl-6 space-y-1;
+  margin: 0.65rem 0;
+  padding-left: 1.4rem;
+  list-style: decimal;
 }
-.md-prose li > ul,
-.md-prose li > ol {
-  @apply my-1;
+.md-prose li {
+  margin: 0.25rem 0;
 }
 .md-prose blockquote {
-  @apply my-3 border-l-4 border-brand-300 bg-brand-50 px-4 py-2 rounded-r-lg text-slate-600;
+  margin: 0.9rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  color: var(--muted);
 }
 .md-prose code {
-  @apply rounded bg-slate-100 px-1.5 py-0.5 text-[13px] font-mono text-brand-700;
+  font-family: var(--font-mono-family);
+  font-size: 0.85em;
+  background: var(--surface-2);
+  color: var(--accent);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--r-sm);
 }
 .md-prose pre {
-  @apply my-3 overflow-x-auto rounded-xl bg-slate-900 p-4;
+  margin: 0.9rem 0;
+  padding: 1rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow-x: auto;
 }
 .md-prose pre code {
-  @apply bg-transparent p-0 text-slate-100;
+  background: none;
+  color: var(--ink);
+  padding: 0;
 }
 .md-prose table {
-  @apply my-3 w-full border-collapse text-sm;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.9rem 0;
+  font-size: 0.9em;
+}
+.md-prose th,
+.md-prose td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
 }
 .md-prose th {
-  @apply border border-slate-200 bg-slate-50 px-3 py-2 text-left font-semibold;
-}
-.md-prose td {
-  @apply border border-slate-200 px-3 py-2 align-top;
+  background: var(--surface);
+  font-weight: 600;
 }
 .md-prose a {
-  @apply text-brand-600 underline underline-offset-2 hover:text-brand-700;
-}
-.md-prose hr {
-  @apply my-6 border-slate-200;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .md-prose strong {
-  @apply font-semibold text-slate-900;
+  color: var(--ink);
+  font-weight: 650;
+}
+.md-prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
 }
 
-/* Flashcard flip */
+/* ---------------- Flashcard flip ---------------- */
 .perspective-1000 {
   perspective: 1200px;
 }
@@ -120,7 +306,7 @@ body {
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -128,20 +314,31 @@ body {
   }
 }
 .animate-fade-up {
-  animation: fadeUp 0.5s ease both;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes pulseRing {
   0% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
+    box-shadow: 0 0 0 0 oklch(0.55 0.16 28 / 0.4);
   }
   70% {
-    box-shadow: 0 0 0 18px rgba(239, 68, 68, 0);
+    box-shadow: 0 0 0 18px oklch(0.55 0.16 28 / 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    box-shadow: 0 0 0 0 oklch(0.55 0.16 28 / 0);
   }
 }
 .animate-pulse-ring {
-  animation: pulseRing 1.6s ease-out infinite;
+  animation: pulseRing 1.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,430 +1,419 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  ArrowUpRight,
   AudioLines,
-  BookOpenCheck,
   Brain,
   FileText,
   Image as ImageIcon,
-  Languages,
   ListChecks,
-  MessageCircleQuestion,
+  MessageCircle,
   Mic,
   Network,
   NotebookPen,
-  Sparkles,
-  CirclePlay,
+  PlayCircle,
 } from "lucide-react";
 import PricingSection from "@/components/marketing/PricingSection";
 import FAQList from "@/components/marketing/FAQList";
+import ThemeShowcase from "@/components/marketing/ThemeShowcase";
 
 export const metadata: Metadata = {
-  title: "EasyNote: AI Note-Taking Assistant — Notes, Flashcards & Summaries",
+  title: "Recall — remember what you learn",
   description:
-    "Turn audio, video, YouTube links, PDFs and images into structured notes, summaries, flashcards, quizzes, mind maps and an AI tutor you can chat with.",
+    "Recall turns lectures, meetings, YouTube, PDFs and images into structured notes, flashcards, quizzes, mind maps and a chat tutor — so it actually sticks.",
 };
 
-const INPUTS = [
-  {
-    icon: Mic,
-    title: "Record live",
-    desc: "Capture lectures and meetings with real-time transcription right in your browser.",
-  },
-  {
-    icon: AudioLines,
-    title: "Audio & video files",
-    desc: "Upload mp3, m4a, wav, mp4 and more — we transcribe every word with timestamps.",
-  },
-  {
-    icon: CirclePlay,
-    title: "YouTube links",
-    desc: "Paste a link and get the full transcript plus organized notes in minutes.",
-  },
-  {
-    icon: FileText,
-    title: "PDF documents",
-    desc: "Textbooks, papers and reports become clean, structured study notes.",
-  },
-  {
-    icon: ImageIcon,
-    title: "Images & slides",
-    desc: "Photograph a whiteboard or slide — the AI reads it and takes the notes.",
-  },
+const STUDY_TOOLS = [
   {
     icon: NotebookPen,
-    title: "Pasted text",
-    desc: "Drop in any article or raw notes and let the AI restructure them for you.",
-  },
-];
-
-const TOOLS = [
-  {
-    icon: Sparkles,
-    title: "AI Notes & Summaries",
-    desc: "Every source becomes an overview, key takeaways, and detailed structured notes in Markdown — editable and exportable.",
-  },
-  {
-    icon: BookOpenCheck,
-    title: "Time-stamped Transcript",
-    desc: "Full transcripts broken into readable paragraphs. Click any line to jump to that exact moment in the audio or video.",
+    title: "Structured notes",
+    body: "Every source becomes an overview, key points and section-by-section notes — in its own language, editable and exportable.",
+    demo: (
+      <div className="space-y-2">
+        <div className="h-3 w-2/3 rounded bg-ink/80" />
+        <div className="h-2 w-full rounded bg-ink/15" />
+        <div className="h-2 w-11/12 rounded bg-ink/15" />
+        <div className="mt-3 flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <div className="h-2 w-3/4 rounded bg-primary/25" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <div className="h-2 w-2/3 rounded bg-primary/25" />
+        </div>
+      </div>
+    ),
   },
   {
     icon: Brain,
-    title: "Flashcards",
-    desc: "Auto-generated decks that test one concept per card. Flip, shuffle and mark what you know.",
+    title: "Flashcards & quizzes",
+    body: "Spaced-repetition decks and multiple-choice quizzes with explanations, generated from your material — so review time is retrieval, not rereading.",
+    demo: (
+      <div className="grid gap-2">
+        <div className="rounded-md border border-primary/40 bg-primary/8 p-3">
+          <div className="text-[10px] font-bold uppercase tracking-wide text-primary">
+            Card 3 / 12
+          </div>
+          <div className="mt-1 text-sm font-semibold text-ink">
+            What is the anchoring effect?
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex-1 rounded-md border border-accent/50 bg-accent/10 px-3 py-2 text-xs font-medium text-ink">
+            ✓ Correct
+          </div>
+          <div className="flex-1 rounded-md border border-border px-3 py-2 text-xs text-muted">
+            Try again
+          </div>
+        </div>
+      </div>
+    ),
   },
   {
-    icon: ListChecks,
-    title: "Quizzes",
-    desc: "Multiple-choice questions with instant feedback and explanations, so you know exactly what to review.",
-  },
-  {
-    icon: Network,
-    title: "Mind Maps",
-    desc: "See the structure of any topic at a glance with an interactive mind map built from your notes.",
-  },
-  {
-    icon: MessageCircleQuestion,
-    title: "Chat with your notes",
-    desc: "Ask questions and get answers grounded in your material — like office hours, any time.",
+    icon: MessageCircle,
+    title: "Chat tutor + mind map",
+    body: "Ask questions and get answers grounded in the material, or step back and see the whole topic as a mind map. Office hours, any hour.",
+    demo: (
+      <div className="space-y-2">
+        <div className="ml-auto w-fit max-w-[80%] rounded-lg rounded-br-sm bg-primary px-3 py-1.5 text-xs text-primary-ink">
+          Explain it with an example
+        </div>
+        <div className="w-fit max-w-[85%] rounded-lg rounded-bl-sm bg-surface-2 px-3 py-1.5 text-xs text-ink">
+          Sure — when you see a $1,200 watch first, a $400 one feels cheap…
+        </div>
+      </div>
+    ),
   },
 ];
 
 const TESTIMONIALS = [
   {
+    quote:
+      "I record every lecture and Recall hands me the notes, a deck and a quiz before I've left the building. Review time roughly halved.",
     name: "Maya R.",
     role: "Pre-med student",
-    quote:
-      "I record every lecture and EasyNote hands me the notes, the flashcards and a quiz before I've even left the building. My review time dropped in half.",
   },
   {
+    quote:
+      "Meetings go in, decisions come out. Asking a three-week-old meeting why we chose a vendor — and getting the timestamp — is the feature I didn't know I needed.",
     name: "Daniel K.",
     role: "Product manager",
-    quote:
-      "Meeting recordings go in, action-ready summaries come out. Chatting with past meetings to find decisions is the feature I didn't know I needed.",
-  },
-  {
-    name: "Xinyi L.",
-    role: "Graduate researcher",
-    quote:
-      "Fifty-page papers become structured notes with key points in minutes, and the translation feature lets me study them in my native language.",
   },
 ];
 
 const HOME_FAQ = [
   {
     q: "What can I turn into notes?",
-    a: "Live recordings, uploaded audio and video files, YouTube links, PDF documents, images (slides, whiteboards, book pages) and pasted text. Every source becomes a transcript plus structured AI notes.",
+    a: "Live recordings, uploaded audio and video, YouTube links, PDFs, images (slides, whiteboards, book pages) and pasted text. Each becomes a transcript plus structured notes.",
   },
   {
-    q: "How accurate are the notes?",
-    a: "Notes are generated from the actual transcript or document text, and every note keeps its source content attached so you can verify anything in one click. You can also edit the notes directly.",
+    q: "Are the notes trustworthy?",
+    a: "Notes are generated from the actual transcript or document, and every note keeps its source attached so you can verify any claim in one click. You can also edit them directly.",
   },
   {
     q: "Does it work in my language?",
-    a: "Yes. Notes are generated in the language of your source material, and you can translate any note into 15+ languages including Chinese, Spanish, Japanese and French.",
+    a: "Yes. Notes are written in the language of your source, and you can translate any note into 15+ languages including Chinese, Spanish, Japanese and French.",
   },
   {
-    q: "Is there a free plan?",
-    a: "Yes — the Starter plan includes 10 AI notes per month, flashcards, quizzes, mind maps and AI chat, free forever. Upgrade to Pro when you need unlimited notes.",
-  },
-  {
-    q: "Can I share my notes?",
-    a: "Every note can be shared with a read-only public link, and exported as Markdown, plain text or a transcript file.",
+    q: "What are the four themes?",
+    a: "Recall ships four distinct visual designs — Swiss, Midnight, Editorial and Botanic — that you switch anytime from the top bar. They restyle the whole app instantly; your notes are untouched.",
   },
 ];
 
-function HeroPreview() {
-  return (
-    <div className="relative mx-auto mt-14 max-w-4xl">
-      <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-r from-brand-200/60 via-fuchsia-100 to-sky-100 blur-2xl" />
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-brand-100">
-        {/* window chrome */}
-        <div className="flex items-center gap-1.5 border-b border-slate-100 bg-slate-50 px-4 py-2.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-rose-300" />
-          <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
-          <span className="ml-3 text-xs text-slate-400">
-            EasyNote — Cognitive Biases, Lecture 4
-          </span>
-        </div>
-        <div className="grid md:grid-cols-[1.25fr_1fr]">
-          {/* notes side */}
-          <div className="border-b border-slate-100 p-5 md:border-b-0 md:border-r">
-            <div className="flex gap-2 text-[11px] font-semibold">
-              <span className="rounded-full bg-brand-600 px-2.5 py-1 text-white">
-                Notes
-              </span>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-slate-500">
-                Transcript
-              </span>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-slate-500">
-                Chat
-              </span>
-            </div>
-            <div className="mt-4 space-y-2 text-left">
-              <div className="text-sm font-bold text-slate-900">
-                ## Anchoring effect
-              </div>
-              <div className="h-2 w-11/12 rounded bg-slate-100" />
-              <div className="h-2 w-4/5 rounded bg-slate-100" />
-              <div className="flex items-center gap-2 pt-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-                <div className="h-2 w-3/4 rounded bg-brand-100" />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-                <div className="h-2 w-2/3 rounded bg-brand-100" />
-              </div>
-              <div className="pt-2 text-sm font-bold text-slate-900">
-                ## Confirmation bias
-              </div>
-              <div className="h-2 w-10/12 rounded bg-slate-100" />
-              <div className="h-2 w-3/5 rounded bg-slate-100" />
-            </div>
-          </div>
-          {/* study tools side */}
-          <div className="grid gap-3 p-5">
-            <div className="rounded-xl border border-brand-200 bg-brand-50 p-3.5 text-left">
-              <div className="text-[10px] font-bold uppercase tracking-wide text-brand-600">
-                Flashcard 3/12
-              </div>
-              <div className="mt-1.5 text-sm font-semibold text-slate-800">
-                What is the anchoring effect?
-              </div>
-              <div className="mt-2 text-xs text-slate-500">
-                Tap to reveal answer ↺
-              </div>
-            </div>
-            <div className="rounded-xl border border-slate-200 p-3.5 text-left">
-              <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                Quiz
-              </div>
-              <div className="mt-1.5 text-xs font-medium text-slate-700">
-                Which bias explains sticking to first impressions?
-              </div>
-              <div className="mt-2 space-y-1.5">
-                <div className="rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-medium text-emerald-700">
-                  ✓ Anchoring
-                </div>
-                <div className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] text-slate-500">
-                  Framing
-                </div>
-              </div>
-            </div>
-            <div className="rounded-xl border border-slate-200 p-3.5 text-left">
-              <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                Ask AI
-              </div>
-              <div className="mt-1.5 rounded-lg bg-slate-100 px-2.5 py-1.5 text-[11px] text-slate-600">
-                Explain it with a shopping example…
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+const SOURCES = [
+  { icon: Mic, label: "Live recording", note: "real-time transcript" },
+  { icon: AudioLines, label: "Audio & video", note: "mp3, m4a, mp4…" },
+  { icon: PlayCircle, label: "YouTube", note: "paste a link" },
+  { icon: FileText, label: "PDF", note: "incl. scanned" },
+  { icon: ImageIcon, label: "Images", note: "slides, whiteboards" },
+  { icon: NotebookPen, label: "Pasted text", note: "articles, notes" },
+];
 
 export default function HomePage() {
   return (
     <>
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,#ece5ff_0%,rgba(255,255,255,0)_70%)]" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-16 text-center sm:px-6 sm:pt-24">
-          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-700 shadow-sm">
-            <Sparkles size={14} />
-            Your AI note-taking assistant
+      {/* ---------------- HERO ---------------- */}
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="animate-fade-up">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              Notes, flashcards, quizzes & a tutor — from anything
+            </div>
+            <h1 className="font-display mt-5 text-[clamp(2.6rem,6vw,4.4rem)] font-bold leading-[1.02] text-ink">
+              Stop re-watching.
+              <br />
+              Start remembering.
+            </h1>
+            <p className="mt-6 max-w-lg text-lg leading-8 text-muted">
+              Recall listens to the lecture, reads the paper, watches the video
+              — and hands back notes you can trust, flashcards that test the
+              right things, and a tutor that knows your material.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/login?mode=signup"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-ink transition hover:opacity-90"
+              >
+                Start free <ArrowUpRight size={16} />
+              </Link>
+              <Link
+                href="/features"
+                className="inline-flex items-center justify-center rounded-md border border-border px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink/30"
+              >
+                See how it works
+              </Link>
+            </div>
+            <p className="mt-4 text-xs text-muted">
+              No credit card · four themes · 15+ languages
+            </p>
           </div>
-          <h1 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl">
-            Stop taking notes.
-            <br />
-            <span className="bg-gradient-to-r from-brand-600 via-fuchsia-600 to-sky-600 bg-clip-text text-transparent">
-              Start understanding.
-            </span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-            EasyNote turns lectures, meetings, YouTube videos, PDFs and images
-            into structured notes, flashcards, quizzes, mind maps and an AI
-            tutor you can ask anything.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/login?mode=signup"
-              className="w-full rounded-xl bg-brand-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-brand-200 transition hover:bg-brand-700 sm:w-auto"
-            >
-              Get started — it&apos;s free
-            </Link>
-            <Link
-              href="/features"
-              className="w-full rounded-xl border border-slate-300 bg-white px-7 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
-            >
-              See how it works
-            </Link>
+
+          {/* app preview mock */}
+          <div className="animate-fade-up relative" style={{ animationDelay: "80ms" }}>
+            <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-[var(--shadow-soft)]">
+              <div className="flex items-center gap-1.5 border-b border-border px-4 py-3">
+                <span className="h-2.5 w-2.5 rounded-full bg-faint" />
+                <span className="h-2.5 w-2.5 rounded-full bg-faint" />
+                <span className="h-2.5 w-2.5 rounded-full bg-faint" />
+                <span className="ml-3 font-mono text-[11px] text-muted">
+                  Cognitive Biases · Lecture 4
+                </span>
+              </div>
+              <div className="grid grid-cols-[1.3fr_1fr]">
+                <div className="border-r border-border p-5">
+                  <div className="mb-3 flex gap-1.5 text-[10px] font-semibold">
+                    <span className="rounded bg-primary px-2 py-1 text-primary-ink">
+                      Notes
+                    </span>
+                    <span className="rounded bg-surface-2 px-2 py-1 text-muted">
+                      Transcript
+                    </span>
+                    <span className="rounded bg-surface-2 px-2 py-1 text-muted">
+                      Chat
+                    </span>
+                  </div>
+                  <div className="font-display text-sm font-bold text-ink">
+                    Anchoring effect
+                  </div>
+                  <div className="mt-2 space-y-1.5">
+                    <div className="h-2 w-full rounded bg-ink/10" />
+                    <div className="h-2 w-4/5 rounded bg-ink/10" />
+                    <div className="mt-2.5 flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      <div className="h-2 w-3/4 rounded bg-primary/25" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      <div className="h-2 w-2/3 rounded bg-primary/25" />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3 p-4">
+                  <div className="rounded-md border border-primary/40 bg-primary/8 p-3">
+                    <div className="text-[9px] font-bold uppercase tracking-wide text-primary">
+                      Flashcard
+                    </div>
+                    <div className="mt-1 text-xs font-semibold text-ink">
+                      What is anchoring?
+                    </div>
+                  </div>
+                  <div className="rounded-md border border-border p-3">
+                    <div className="text-[9px] font-bold uppercase tracking-wide text-muted">
+                      Quiz
+                    </div>
+                    <div className="mt-1.5 rounded border border-accent/50 bg-accent/10 px-2 py-1 text-[10px] font-medium text-ink">
+                      ✓ Anchoring
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="mt-4 text-xs text-slate-400">
-            No credit card required · Works with 15+ languages
-          </p>
-          <HeroPreview />
         </div>
       </section>
 
-      {/* INPUT TYPES */}
+      {/* ---------------- SOURCES (bento) ---------------- */}
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-        <h2 className="text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-          Capture knowledge from anywhere
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-slate-600">
-          One inbox for everything you learn — no matter the format.
-        </p>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {INPUTS.map((f) => (
+        <div className="max-w-2xl">
+          <h2 className="font-display text-3xl font-bold text-ink sm:text-4xl">
+            One inbox for everything you learn
+          </h2>
+          <p className="mt-3 text-muted">
+            However the knowledge arrives, it comes out the same way: clean,
+            structured and searchable.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {SOURCES.map((s, i) => (
             <div
-              key={f.title}
-              className="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg hover:shadow-brand-100"
+              key={s.label}
+              className={`group rounded-lg border border-border bg-surface p-5 transition hover:border-ink/25 ${
+                i === 0 ? "sm:col-span-2 lg:col-span-2 lg:row-span-1" : ""
+              }`}
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition group-hover:bg-brand-600 group-hover:text-white">
-                <f.icon size={22} />
+              <s.icon
+                size={22}
+                className="text-primary transition group-hover:scale-110"
+              />
+              <div className="mt-3 font-display font-semibold text-ink">
+                {s.label}
               </div>
-              <div className="mt-4 font-bold text-slate-900">{f.title}</div>
-              <p className="mt-1.5 text-sm leading-6 text-slate-600">
-                {f.desc}
-              </p>
+              <div className="mt-0.5 text-xs text-muted">{s.note}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="bg-slate-50 py-20">
+      {/* ---------------- STUDY TOOLS (alternating rows) ---------------- */}
+      <section className="border-y border-border bg-surface py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-            From raw material to mastery in three steps
+          <h2 className="font-display max-w-2xl text-3xl font-bold text-ink sm:text-4xl">
+            A whole study toolkit, made for you
           </h2>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
+          <div className="mt-12 space-y-14">
+            {STUDY_TOOLS.map((t, i) => (
+              <div
+                key={t.title}
+                className="grid items-center gap-8 md:grid-cols-2"
+              >
+                <div className={i % 2 === 1 ? "md:order-2" : ""}>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-md bg-primary/10 text-primary">
+                    <t.icon size={22} />
+                  </div>
+                  <h3 className="font-display mt-4 text-xl font-semibold text-ink">
+                    {t.title}
+                  </h3>
+                  <p className="mt-2 max-w-md leading-7 text-muted">{t.body}</p>
+                </div>
+                <div
+                  className={`rounded-lg border border-border bg-bg p-6 ${i % 2 === 1 ? "md:order-1" : ""}`}
+                >
+                  {t.demo}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- THEMES (signature, interactive) ---------------- */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <div className="max-w-2xl">
+          <h2 className="font-display text-3xl font-bold text-ink sm:text-4xl">
+            Four designs. Your call.
+          </h2>
+          <p className="mt-3 text-muted">
+            Recall isn&apos;t one look with a dark switch. Pick a whole design
+            language — and yes, this page changes too. Try one:
+          </p>
+        </div>
+        <div className="mt-10">
+          <ThemeShowcase />
+        </div>
+      </section>
+
+      {/* ---------------- HOW IT WORKS (real sequence) ---------------- */}
+      <section className="border-y border-border bg-surface py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="font-display text-3xl font-bold text-ink sm:text-4xl">
+            From raw to remembered, in three moves
+          </h2>
+          <ol className="mt-12 grid gap-8 md:grid-cols-3">
             {[
               {
                 n: "1",
-                t: "Add your source",
-                d: "Record live, upload a file, or paste a YouTube link. Processing starts immediately.",
+                t: "Add a source",
+                d: "Record live, upload a file, or paste a link. Processing starts immediately.",
               },
               {
                 n: "2",
-                t: "Get instant notes",
-                d: "A clean transcript plus structured notes with an overview, sections and key takeaways.",
+                t: "Get your notes",
+                d: "A clean transcript plus structured notes with an overview and key takeaways.",
               },
               {
                 n: "3",
-                t: "Study smarter",
-                d: "Generate flashcards, quiz yourself, explore the mind map, or chat with an AI tutor that knows your material.",
+                t: "Make it stick",
+                d: "Generate flashcards, quiz yourself, explore the mind map, ask the tutor.",
               },
             ].map((s) => (
-              <div key={s.n} className="relative rounded-2xl bg-white p-7 shadow-sm">
-                <div className="absolute -top-4 left-7 flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-sm font-extrabold text-white shadow-md">
+              <li key={s.n} className="border-t-2 border-primary pt-5">
+                <div className="font-display text-4xl font-bold text-primary">
                   {s.n}
                 </div>
-                <div className="mt-3 font-bold text-slate-900">{s.t}</div>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{s.d}</p>
-              </div>
+                <div className="font-display mt-2 text-lg font-semibold text-ink">
+                  {s.t}
+                </div>
+                <p className="mt-1.5 text-sm leading-6 text-muted">{s.d}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {/* STUDY TOOLS */}
+      {/* ---------------- TESTIMONIALS ---------------- */}
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-        <h2 className="text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-          A complete study toolkit, generated for you
-        </h2>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {TOOLS.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-2xl border border-slate-200 bg-white p-6"
+        <div className="grid gap-6 md:grid-cols-2">
+          {TESTIMONIALS.map((t) => (
+            <figure
+              key={t.name}
+              className="flex flex-col rounded-lg border border-border bg-surface p-7"
             >
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white">
-                  <f.icon size={20} />
-                </div>
-                <div className="font-bold text-slate-900">{f.title}</div>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{f.desc}</p>
-            </div>
+              <div className="text-accent">★★★★★</div>
+              <blockquote className="mt-3 flex-1 text-lg leading-8 text-ink">
+                “{t.quote}”
+              </blockquote>
+              <figcaption className="mt-5 text-sm">
+                <span className="font-semibold text-ink">{t.name}</span>
+                <span className="text-muted"> · {t.role}</span>
+              </figcaption>
+            </figure>
           ))}
         </div>
-        <div className="mt-10 flex items-center justify-center gap-2 rounded-2xl border border-brand-100 bg-brand-50/60 px-6 py-4 text-sm text-brand-800">
-          <Languages size={18} />
-          <span>
-            <strong>Study in any language</strong> — translate notes and
-            summaries into 15+ languages with one click.
-          </span>
-        </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section className="bg-gradient-to-b from-white to-brand-50/50 py-20">
+      {/* ---------------- PRICING ---------------- */}
+      <section className="border-t border-border bg-surface py-20" id="pricing">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <h2 className="text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-            Loved by students and professionals
-          </h2>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
-              <figure
-                key={t.name}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-              >
-                <div className="text-amber-400">★★★★★</div>
-                <blockquote className="mt-3 text-sm leading-6 text-slate-700">
-                  “{t.quote}”
-                </blockquote>
-                <figcaption className="mt-4 text-sm">
-                  <span className="font-semibold text-slate-900">{t.name}</span>
-                  <span className="text-slate-500"> · {t.role}</span>
-                </figcaption>
-              </figure>
-            ))}
+          <div className="text-center">
+            <h2 className="font-display text-3xl font-bold text-ink sm:text-4xl">
+              Honest pricing
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-muted">
+              Start free. Upgrade when your notes can&apos;t keep up with you.
+            </p>
+          </div>
+          <div className="mt-10">
+            <PricingSection compact />
           </div>
         </div>
       </section>
 
-      {/* PRICING */}
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6" id="pricing">
-        <h2 className="text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-          Simple, honest pricing
-        </h2>
-        <p className="mx-auto mb-10 mt-3 max-w-xl text-center text-slate-600">
-          Start free. Upgrade when your notes can&apos;t keep up with you.
-        </p>
-        <PricingSection compact />
-      </section>
-
-      {/* FAQ */}
-      <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6">
-        <h2 className="text-center text-3xl font-extrabold tracking-tight text-slate-900">
-          Frequently asked questions
+      {/* ---------------- FAQ ---------------- */}
+      <section className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
+        <h2 className="font-display text-center text-3xl font-bold text-ink">
+          Questions
         </h2>
         <div className="mt-8">
           <FAQList items={HOME_FAQ} />
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* ---------------- CTA ---------------- */}
       <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-700 via-brand-600 to-fuchsia-600 px-8 py-14 text-center shadow-xl">
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            Ready to learn twice as fast?
+        <div className="rounded-xl border border-border bg-primary px-8 py-16 text-center">
+          <h2 className="font-display text-3xl font-bold text-primary-ink sm:text-4xl">
+            Learn it once. Keep it.
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-brand-100">
-            Join learners who let EasyNote handle the note-taking so they can
-            focus on understanding.
+          <p className="mx-auto mt-3 max-w-md text-primary-ink/80">
+            Bring one lecture, meeting or video and see what it feels like when
+            the notes take themselves.
           </p>
           <Link
             href="/login?mode=signup"
-            className="mt-7 inline-block rounded-xl bg-white px-8 py-3 text-sm font-bold text-brand-700 shadow-lg transition hover:bg-brand-50"
+            className="mt-8 inline-flex items-center gap-2 rounded-md bg-bg px-7 py-3 text-sm font-semibold text-ink transition hover:opacity-90"
           >
-            Create your free account
+            Create your free account <ArrowUpRight size={16} />
           </Link>
         </div>
       </section>

@@ -124,21 +124,21 @@ export default function CreateHub({ onCreated }: { onCreated: () => void }) {
       icon: Mic,
       title: "Record audio",
       desc: "Live transcription",
-      color: "bg-rose-50 text-rose-600",
+      color: "bg-accent/10 text-accent",
       onClick: () => router.push("/recording"),
     },
     {
       icon: AudioLines,
       title: "Audio / video",
       desc: "mp3, m4a, wav, mp4…",
-      color: "bg-sky-50 text-sky-600",
+      color: "bg-primary/10 text-primary",
       onClick: () => pickFile("audio/*,video/*"),
     },
     {
       icon: CirclePlay,
       title: "YouTube link",
       desc: "Paste a video URL",
-      color: "bg-red-50 text-red-600",
+      color: "bg-accent/10 text-accent",
       onClick: () => {
         setUrl("");
         setModal("youtube");
@@ -148,21 +148,21 @@ export default function CreateHub({ onCreated }: { onCreated: () => void }) {
       icon: FileText,
       title: "PDF document",
       desc: "Papers & textbooks",
-      color: "bg-amber-50 text-amber-600",
+      color: "bg-surface-2 text-ink",
       onClick: () => pickFile("application/pdf"),
     },
     {
       icon: ImageIcon,
       title: "Image",
       desc: "Slides & whiteboards",
-      color: "bg-emerald-50 text-emerald-600",
+      color: "bg-surface-2 text-ink",
       onClick: () => pickFile("image/*"),
     },
     {
       icon: NotebookPen,
       title: "Paste text",
       desc: "Articles & raw notes",
-      color: "bg-brand-50 text-brand-600",
+      color: "bg-primary/10 text-primary",
       onClick: () => {
         setTitle("");
         setText("");
@@ -178,30 +178,30 @@ export default function CreateHub({ onCreated }: { onCreated: () => void }) {
           <button
             key={t.title}
             onClick={t.onClick}
-            className="group rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
+            className="group rounded-lg border border-border bg-surface p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-soft)]"
           >
             <div
-              className={`flex h-10 w-10 items-center justify-center rounded-xl ${t.color}`}
+              className={`flex h-10 w-10 items-center justify-center rounded-md ${t.color}`}
             >
               <t.icon size={20} />
             </div>
-            <div className="mt-3 text-sm font-bold text-slate-900">
+            <div className="mt-3 font-display text-sm font-bold text-ink">
               {t.title}
             </div>
-            <div className="mt-0.5 text-xs text-slate-500">{t.desc}</div>
+            <div className="mt-0.5 text-xs text-muted">{t.desc}</div>
           </button>
         ))}
       </div>
 
       {uploadPct !== null && (
-        <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50 p-4">
-          <div className="flex justify-between text-sm font-medium text-brand-800">
+        <div className="mt-4 rounded-lg border border-primary/30 bg-primary/10 p-4">
+          <div className="flex justify-between text-sm font-medium text-primary">
             <span>Uploading…</span>
             <span>{uploadPct}%</span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-brand-100">
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-primary/20">
             <div
-              className="h-full rounded-full bg-brand-600 transition-all"
+              className="h-full rounded-full bg-primary transition-all"
               style={{ width: `${uploadPct}%` }}
             />
           </div>
@@ -249,7 +249,7 @@ export default function CreateHub({ onCreated }: { onCreated: () => void }) {
             }}
           />
         </Field>
-        <p className="mt-2 text-xs text-slate-400">
+        <p className="mt-2 text-xs text-muted">
           The video needs captions (most do). We&apos;ll fetch the transcript
           and write full notes.
         </p>

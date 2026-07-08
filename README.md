@@ -1,4 +1,4 @@
-# EasyNote — AI Note-Taking Assistant
+# Recall — AI Note-Taking Assistant
 
 Turn **live recordings, audio/video files, YouTube links, PDFs, images and pasted text** into structured notes, summaries, key points, **flashcards, quizzes, mind maps** and an **AI chat tutor** grounded in your material — with translation into 15+ languages, folders, sharing and export.
 

@@ -139,11 +139,14 @@ function layoutTree(
   return { nodes, height: Math.max(leafY, Y_GAP) };
 }
 
+// Colors are theme tokens (var) with a hex fallback so the live map re-themes
+// with [data-theme] while an exported standalone SVG (no :root vars) still
+// renders with the swiss-palette fallback.
 const PALETTE = [
-  { fill: "#7c22f3", text: "#ffffff", stroke: "#7c22f3" }, // root
-  { fill: "#ece5ff", text: "#4c1290", stroke: "#c0a7ff" },
-  { fill: "#ffffff", text: "#334155", stroke: "#cbd5e1" },
-  { fill: "#f8fafc", text: "#475569", stroke: "#e2e8f0" },
+  { fill: "var(--primary, #3d63c9)", text: "var(--primary-ink, #ffffff)", stroke: "var(--primary, #3d63c9)" }, // root
+  { fill: "var(--surface-2, #eef0f2)", text: "var(--primary, #3d63c9)", stroke: "var(--primary, #3d63c9)" },
+  { fill: "var(--surface, #f7f7f8)", text: "var(--ink, #2b2f36)", stroke: "var(--border, #dcdfe4)" },
+  { fill: "var(--surface-2, #eef0f2)", text: "var(--muted, #667085)", stroke: "var(--border, #dcdfe4)" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -164,10 +167,10 @@ export default function MindmapTab({ note }: { note: NoteData }) {
 
   if (!note.notesMarkdown && tree.children.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-        <Network className="mx-auto text-brand-400" size={36} />
-        <div className="mt-3 font-bold text-slate-800">No mind map yet</div>
-        <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-500">
+      <div className="rounded-lg border border-dashed border-border bg-surface px-6 py-14 text-center">
+        <Network className="mx-auto text-primary" size={36} />
+        <div className="mt-3 font-display font-bold text-ink">No mind map yet</div>
+        <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted">
           The mind map is built from your note&apos;s structure — generate AI
           notes first (Notes tab) and the map will appear here.
         </p>
@@ -222,7 +225,7 @@ export default function MindmapTab({ note }: { note: NoteData }) {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-muted">
           Click a node to collapse/expand · drag to pan · scroll to zoom
         </p>
         <div className="flex gap-1.5">
@@ -241,7 +244,7 @@ export default function MindmapTab({ note }: { note: NoteData }) {
         </div>
       </div>
 
-      <div className="h-[34rem] overflow-hidden rounded-2xl border border-slate-200 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-white [background-size:22px_22px]">
+      <div className="h-[34rem] overflow-hidden rounded-lg border border-border bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-surface [background-size:22px_22px]">
         <svg
           ref={svgRef}
           className="h-full w-full cursor-grab active:cursor-grabbing"
@@ -281,7 +284,7 @@ export default function MindmapTab({ note }: { note: NoteData }) {
                           ${n.x - 40} ${n.y + NODE_H / 2},
                           ${n.x} ${n.y + NODE_H / 2}`}
                     fill="none"
-                    stroke="#c7d2fe"
+                    stroke="var(--border, #dcdfe4)"
                     strokeWidth={1.6 / view.k}
                   />
                 )
@@ -318,13 +321,13 @@ export default function MindmapTab({ note }: { note: NoteData }) {
                   </text>
                   {hasKids && (
                     <g transform={`translate(${NODE_W - 1},${NODE_H / 2})`}>
-                      <circle r={8} fill="#fff" stroke="#c0a7ff" strokeWidth={1.2} />
+                      <circle r={8} fill="var(--surface, #f7f7f8)" stroke="var(--primary, #3d63c9)" strokeWidth={1.2} />
                       <text
                         textAnchor="middle"
                         y={3.5}
                         fontSize={10}
                         fontWeight={700}
-                        fill="#7c22f3"
+                        fill="var(--primary, #3d63c9)"
                       >
                         {n.collapsed ? "+" : "–"}
                       </text>

@@ -140,10 +140,10 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
     return (
       <div className="mx-auto max-w-xl px-6 py-24 text-center">
         <div className="text-4xl">🤔</div>
-        <div className="mt-3 font-bold text-slate-800">{loadError}</div>
+        <div className="mt-3 font-display font-bold text-ink">{loadError}</div>
         <Link
           href="/notes"
-          className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline"
+          className="mt-4 inline-block text-sm font-semibold text-primary hover:underline"
         >
           ← Back to my notes
         </Link>
@@ -154,7 +154,7 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
   if (!note) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
-        <Loader2 className="animate-spin text-brand-500" size={28} />
+        <Loader2 className="animate-spin text-primary" size={28} />
       </div>
     );
   }
@@ -283,7 +283,7 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
       <div className="flex items-center justify-between gap-3">
         <Link
           href="/notes"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted transition hover:text-ink"
         >
           <ArrowLeft size={16} /> My notes
         </Link>
@@ -434,13 +434,13 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
       </div>
 
       {toolbarError && (
-        <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+        <div className="mt-3 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">
           {toolbarError}
         </div>
       )}
 
       {audioWarn && (
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800">
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm text-ink">
           <span>
             Your transcript was saved, but the audio couldn&apos;t be attached
             — playback won&apos;t be available for this recording.
@@ -462,11 +462,11 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
           <div className="mt-5 flex items-start gap-3">
             <div className="text-3xl leading-tight">{note.emoji}</div>
             <div className="min-w-0">
-              <h1 className="text-2xl font-extrabold leading-tight text-slate-900">
+              <h1 className="font-display text-2xl font-extrabold leading-tight text-ink">
                 {note.title}
               </h1>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 font-bold uppercase tracking-wide text-slate-500">
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
+                <span className="rounded-full bg-surface-2 px-2 py-0.5 font-bold uppercase tracking-wide text-muted">
                   {SOURCE_LABEL[note.sourceType]}
                 </span>
                 {note.language && <span>lang: {note.language}</span>}
@@ -479,7 +479,7 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
                     href={note.sourceUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-brand-600 hover:underline"
+                    className="inline-flex items-center gap-1 text-primary hover:underline"
                   >
                     <Link2 size={12} /> source
                   </a>
@@ -496,15 +496,15 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
           )}
 
           {/* tabs */}
-          <div className="thin-scroll mt-6 flex gap-1 overflow-x-auto border-b border-slate-200">
+          <div className="thin-scroll mt-6 flex gap-1 overflow-x-auto border-b border-border">
             {TABS.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
                 className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3.5 py-2.5 text-sm font-semibold transition ${
                   tab === t.key
-                    ? "border-brand-600 text-brand-700"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted hover:text-ink"
                 }`}
               >
                 <t.icon size={15} />
@@ -554,22 +554,22 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
         onClose={() => setShareOpen(false)}
         title="Share this note"
       >
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted">
           Anyone with the link can view a read-only version of the notes and
           transcript.
         </p>
-        <div className="mt-4 flex items-center justify-between rounded-xl border border-slate-200 p-3.5">
-          <span className="text-sm font-semibold text-slate-700">
+        <div className="mt-4 flex items-center justify-between rounded-lg border border-border p-3.5">
+          <span className="text-sm font-semibold text-ink">
             Public link
           </span>
           <button
             onClick={() => toggleShare(!note.shareToken)}
             disabled={shareBusy}
-            className={`relative h-6 w-11 rounded-full transition ${note.shareToken ? "bg-brand-600" : "bg-slate-300"}`}
+            className={`relative h-6 w-11 rounded-full transition ${note.shareToken ? "bg-primary" : "bg-surface-2"}`}
             aria-label="Toggle sharing"
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${note.shareToken ? "left-[22px]" : "left-0.5"}`}
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-surface shadow-[var(--shadow-soft)] transition-all ${note.shareToken ? "left-[22px]" : "left-0.5"}`}
             />
           </button>
         </div>
@@ -627,7 +627,7 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
         <div className="space-y-1.5">
           <button
             onClick={() => move(null)}
-            className={`w-full rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition hover:border-brand-400 ${!note.folderId ? "border-brand-500 bg-brand-50 text-brand-700" : "border-slate-200 text-slate-700"}`}
+            className={`w-full rounded-md border px-4 py-2.5 text-left text-sm font-medium transition hover:border-primary ${!note.folderId ? "border-primary bg-primary/10 text-primary" : "border-border text-ink"}`}
           >
             🗂️ All notes (no folder)
           </button>
@@ -635,13 +635,13 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
             <button
               key={f.id}
               onClick={() => move(f.id)}
-              className={`w-full rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition hover:border-brand-400 ${note.folderId === f.id ? "border-brand-500 bg-brand-50 text-brand-700" : "border-slate-200 text-slate-700"}`}
+              className={`w-full rounded-md border px-4 py-2.5 text-left text-sm font-medium transition hover:border-primary ${note.folderId === f.id ? "border-primary bg-primary/10 text-primary" : "border-border text-ink"}`}
             >
               📁 {f.name}
             </button>
           ))}
           {folders.length === 0 && (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted">
               No folders yet — create one from the sidebar.
             </p>
           )}
@@ -654,7 +654,7 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
         onClose={() => setDeleteOpen(false)}
         title="Delete note?"
       >
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted">
           “{note.title}” and all its study materials will be permanently
           deleted.
         </p>
@@ -681,7 +681,7 @@ function MenuPanel({
   return (
     <>
       <div className="fixed inset-0 z-10" onClick={onClose} />
-      <div className="thin-scroll absolute right-0 top-10 z-20 max-h-80 w-52 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+      <div className="thin-scroll absolute right-0 top-10 z-20 max-h-80 w-52 overflow-y-auto rounded-lg border border-border bg-surface py-1 shadow-[var(--shadow-soft)]">
         {children}
       </div>
     </>
@@ -702,7 +702,7 @@ function MenuBtn({
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-sm font-medium transition hover:bg-slate-50 ${danger ? "text-rose-600" : "text-slate-700"}`}
+      className={`flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-sm font-medium transition hover:bg-surface-2 ${danger ? "text-red-600" : "text-ink"}`}
     >
       {icon}
       {label}

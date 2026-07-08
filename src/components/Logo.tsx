@@ -1,36 +1,43 @@
 import Link from "next/link";
 
-export function LogoMark({ size = 32 }: { size?: number }) {
+/**
+ * Recall mark: a bracketed dot returning to the line — "recall" as retrieval.
+ * Uses currentColor + the primary token so it recolors per theme.
+ */
+export function LogoMark({ size = 30 }: { size?: number }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 64 64"
+      viewBox="0 0 32 32"
+      fill="none"
       aria-hidden
       className="shrink-0"
     >
-      <defs>
-        <linearGradient id="logo-g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#8546fb" />
-          <stop offset="1" stopColor="#5b13b1" />
-        </linearGradient>
-      </defs>
-      <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#logo-g)" />
+      <rect
+        x="1.25"
+        y="1.25"
+        width="29.5"
+        height="29.5"
+        rx="8"
+        className="fill-surface stroke-border"
+        strokeWidth="1.5"
+      />
       <path
-        d="M20 20h24M20 30h24M20 40h14"
-        stroke="#fff"
-        strokeWidth="5"
+        d="M10 9v14"
+        className="stroke-ink"
+        strokeWidth="2.4"
         strokeLinecap="round"
       />
-      <circle cx="44" cy="44" r="9" fill="#fff" />
       <path
-        d="M40.5 44l2.5 2.5 5-5"
-        stroke="#7c22f3"
-        strokeWidth="2.8"
-        fill="none"
+        d="M15 9c4.4 0 6.6 2 6.6 5.1 0 2.5-1.6 4.2-4.3 4.8L22 23"
+        className="stroke-ink"
+        strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
+        fill="none"
       />
+      <circle cx="23.5" cy="9.5" r="2.4" className="fill-primary" />
     </svg>
   );
 }
@@ -47,11 +54,11 @@ export function Logo({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-2 font-bold text-slate-900 ${className}`}
+      className={`inline-flex items-center gap-2.5 text-ink ${className}`}
     >
       <LogoMark size={size} />
-      <span className="text-lg tracking-tight">
-        Easy<span className="text-brand-600">Note</span>
+      <span className="font-display text-[1.15rem] font-bold tracking-tight">
+        Recall
       </span>
     </Link>
   );

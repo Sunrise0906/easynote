@@ -30,13 +30,13 @@ export default async function SharePage({
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-bg">
+      <header className="border-b border-border bg-surface">
         <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-6">
           <Logo />
           <Link
             href="/login?mode=signup"
-            className="rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white hover:bg-brand-700"
+            className="rounded-md bg-primary px-4 py-2 text-xs font-bold text-primary-ink hover:opacity-90"
           >
             Make your own notes free
           </Link>
@@ -44,15 +44,15 @@ export default async function SharePage({
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        <div className="text-xs font-bold uppercase tracking-wider text-muted">
           Shared note · read-only
         </div>
-        <h1 className="mt-2 text-3xl font-extrabold text-slate-900">
+        <h1 className="mt-2 font-display text-3xl font-extrabold text-ink">
           {note.emoji} {note.title}
         </h1>
 
         {note.youtubeId && (
-          <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-black">
+          <div className="mt-6 overflow-hidden rounded-lg border border-border bg-black">
             <div className="relative aspect-video w-full">
               <iframe
                 className="absolute inset-0 h-full w-full"
@@ -65,16 +65,16 @@ export default async function SharePage({
         )}
 
         {note.summary && (
-          <div className="mt-6 rounded-2xl border border-brand-100 bg-brand-50 p-5">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-brand-600">
+          <div className="mt-6 rounded-lg border border-accent/40 bg-accent/10 p-5">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
               Summary
             </div>
-            <p className="mt-1.5 leading-7 text-slate-700">{note.summary}</p>
+            <p className="mt-1.5 leading-7 text-ink">{note.summary}</p>
             {note.keyPoints && note.keyPoints.length > 0 && (
               <ul className="mt-3 space-y-1.5">
                 {note.keyPoints.map((p, i) => (
-                  <li key={i} className="flex gap-2 text-sm text-slate-600">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-400" />
+                  <li key={i} className="flex gap-2 text-sm text-muted">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                     {p}
                   </li>
                 ))}
@@ -84,7 +84,7 @@ export default async function SharePage({
         )}
 
         {note.notesMarkdown && (
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+          <div className="mt-6 rounded-lg border border-border bg-surface p-6 sm:p-8">
             <div className="md-prose">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {note.notesMarkdown}
@@ -94,15 +94,15 @@ export default async function SharePage({
         )}
 
         {note.transcript.length > 0 && (
-          <details className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
-            <summary className="cursor-pointer font-bold text-slate-900">
+          <details className="mt-6 rounded-lg border border-border bg-surface p-6">
+            <summary className="cursor-pointer font-display font-bold text-ink">
               Transcript ({note.transcript.length} segments)
             </summary>
             <div className="mt-4 space-y-3">
               {note.transcript.map((s, i) => (
-                <p key={i} className="flex gap-3 text-[15px] leading-7 text-slate-700">
+                <p key={i} className="flex gap-3 text-[15px] leading-7 text-ink">
                   {(isTimed || note.sourceType === "pdf") && (
-                    <span className="mt-1 h-fit shrink-0 rounded bg-slate-100 px-1.5 font-mono text-[11px] font-semibold text-slate-500">
+                    <span className="mt-1 h-fit shrink-0 rounded bg-surface-2 px-1.5 font-mono text-[11px] font-semibold text-muted">
                       {note.sourceType === "pdf"
                         ? `p.${s.start}`
                         : clock(s.start)}
@@ -115,19 +115,19 @@ export default async function SharePage({
           </details>
         )}
 
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-brand-600 to-fuchsia-600 p-8 text-center">
-          <div className="text-xl font-extrabold text-white">
+        <div className="mt-10 rounded-lg bg-primary p-8 text-center">
+          <div className="font-display text-xl font-extrabold text-primary-ink">
             Notes like this, from anything you're learning
           </div>
-          <p className="mx-auto mt-1.5 max-w-md text-sm text-brand-100">
-            Record a lecture, paste a YouTube link or upload a PDF — EasyNote
+          <p className="mx-auto mt-1.5 max-w-md text-sm text-primary-ink/80">
+            Record a lecture, paste a YouTube link or upload a PDF — Recall
             writes the notes, flashcards and quiz for you.
           </p>
           <Link
             href="/login?mode=signup"
-            className="mt-5 inline-block rounded-xl bg-white px-6 py-2.5 text-sm font-bold text-brand-700"
+            className="mt-5 inline-block rounded-md bg-primary-ink px-6 py-2.5 text-sm font-bold text-primary"
           >
-            Try EasyNote free
+            Try Recall free
           </Link>
         </div>
       </main>

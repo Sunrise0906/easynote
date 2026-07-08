@@ -6,20 +6,19 @@ import { Check } from "lucide-react";
 
 const FREE_FEATURES = [
   "10 AI notes per month",
-  "YouTube, PDF, image & text import",
-  "Live recording with real-time transcript",
-  "Flashcards & quizzes (starter sizes)",
-  "Mind maps & AI chat (30 msgs/day)",
+  "Every source: record, upload, YouTube, PDF, image, text",
+  "Flashcards, quizzes & mind maps",
+  "Chat tutor (30 messages/day)",
+  "All four themes",
   "Uploads up to 25 MB",
 ];
 
 const PRO_FEATURES = [
   "Unlimited AI notes",
-  "Everything in Starter, unlimited",
-  "Larger flashcard decks & quizzes",
-  "Unlimited AI chat with your notes",
+  "Unlimited chat tutor",
+  "Bigger flashcard decks & quizzes",
   "Uploads up to 200 MB",
-  "Translate notes into 15+ languages",
+  "Translate into 15+ languages",
   "Priority processing",
 ];
 
@@ -32,55 +31,55 @@ export default function PricingSection({
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-center gap-3">
+      <div className="mb-9 flex items-center justify-center gap-3">
         <span
-          className={`text-sm font-medium ${!yearly ? "text-slate-900" : "text-slate-400"}`}
+          className={`text-sm font-medium ${!yearly ? "text-ink" : "text-muted"}`}
         >
           Monthly
         </span>
         <button
           onClick={() => setYearly(!yearly)}
-          className={`relative h-7 w-13 rounded-full transition ${yearly ? "bg-brand-600" : "bg-slate-300"}`}
+          className="relative h-7 rounded-full bg-surface-2 ring-1 ring-border transition"
           style={{ width: 52 }}
           aria-label="Toggle yearly billing"
         >
           <span
-            className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${yearly ? "left-7" : "left-1"}`}
+            className={`absolute top-1 h-5 w-5 rounded-full bg-primary transition-all ${yearly ? "left-7" : "left-1"}`}
           />
         </button>
         <span
-          className={`text-sm font-medium ${yearly ? "text-slate-900" : "text-slate-400"}`}
+          className={`text-sm font-medium ${yearly ? "text-ink" : "text-muted"}`}
         >
           Yearly
-          <span className="ml-1.5 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-            Save 58%
+          <span className="ml-1.5 rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">
+            −58%
           </span>
         </span>
       </div>
 
-      <div className="mx-auto grid max-w-3xl gap-6 md:grid-cols-2">
-        {/* Starter */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-7">
-          <div className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <div className="mx-auto grid max-w-3xl gap-5 md:grid-cols-2">
+        {/* Free */}
+        <div className="rounded-lg border border-border bg-surface p-7">
+          <div className="font-display text-sm font-semibold text-muted">
             Starter
           </div>
           <div className="mt-3 flex items-end gap-1.5">
-            <span className="text-4xl font-extrabold text-slate-900">$0</span>
-            <span className="pb-1 text-sm text-slate-500">forever</span>
+            <span className="font-display text-5xl font-bold text-ink">$0</span>
+            <span className="pb-1.5 text-sm text-muted">forever</span>
           </div>
-          <p className="mt-2 text-sm text-slate-500">
-            Everything you need to try AI note-taking.
+          <p className="mt-2 text-sm text-muted">
+            The full toolkit, for getting started.
           </p>
           <Link
             href="/login?mode=signup"
-            className="mt-5 block rounded-xl border border-slate-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+            className="mt-5 block rounded-md border border-border px-4 py-2.5 text-center text-sm font-semibold text-ink transition hover:border-ink/30"
           >
-            Start for free
+            Start free
           </Link>
           <ul className="mt-6 space-y-2.5">
             {FREE_FEATURES.map((f) => (
-              <li key={f} className="flex gap-2.5 text-sm text-slate-600">
-                <Check size={17} className="mt-0.5 shrink-0 text-slate-400" />
+              <li key={f} className="flex gap-2.5 text-sm text-muted">
+                <Check size={17} className="mt-0.5 shrink-0 text-muted" />
                 {f}
               </li>
             ))}
@@ -88,34 +87,32 @@ export default function PricingSection({
         </div>
 
         {/* Pro */}
-        <div className="relative rounded-3xl border-2 border-brand-500 bg-gradient-to-b from-brand-50/70 to-white p-7 shadow-lg shadow-brand-100">
-          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 px-3 py-1 text-xs font-bold text-white">
-            MOST POPULAR
+        <div className="relative rounded-lg border-2 border-primary bg-surface p-7">
+          <div className="absolute -top-3 left-7 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-ink">
+            Most popular
           </div>
-          <div className="text-sm font-semibold uppercase tracking-wide text-brand-700">
+          <div className="font-display text-sm font-semibold text-primary">
             Pro
           </div>
           <div className="mt-3 flex items-end gap-1.5">
-            <span className="text-4xl font-extrabold text-slate-900">
+            <span className="font-display text-5xl font-bold text-ink">
               ${yearly ? "8.39" : "19.99"}
             </span>
-            <span className="pb-1 text-sm text-slate-500">/ month</span>
+            <span className="pb-1.5 text-sm text-muted">/ month</span>
           </div>
-          <p className="mt-2 text-sm text-slate-500">
-            {yearly
-              ? "Billed yearly ($100.68/year)."
-              : "Billed monthly. Cancel anytime."}
+          <p className="mt-2 text-sm text-muted">
+            {yearly ? "Billed yearly ($100.68)." : "Billed monthly. Cancel anytime."}
           </p>
           <Link
             href={`/price?checkout=${yearly ? "yearly" : "monthly"}`}
-            className="mt-5 block rounded-xl bg-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+            className="mt-5 block rounded-md bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-ink transition hover:opacity-90"
           >
             Upgrade to Pro
           </Link>
           <ul className="mt-6 space-y-2.5">
             {PRO_FEATURES.map((f) => (
-              <li key={f} className="flex gap-2.5 text-sm text-slate-700">
-                <Check size={17} className="mt-0.5 shrink-0 text-brand-600" />
+              <li key={f} className="flex gap-2.5 text-sm text-ink">
+                <Check size={17} className="mt-0.5 shrink-0 text-primary" />
                 {f}
               </li>
             ))}
@@ -124,9 +121,9 @@ export default function PricingSection({
       </div>
 
       {!compact && (
-        <p className="mt-6 text-center text-xs text-slate-400">
-          This is a self-hosted demo build — upgrading switches your local
-          account to Pro instantly, no payment involved.
+        <p className="mt-6 text-center text-xs text-muted">
+          Self-hosted demo build — upgrading flips your local account to Pro
+          instantly, no payment.
         </p>
       )}
     </div>

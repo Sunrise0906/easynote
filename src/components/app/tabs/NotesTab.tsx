@@ -100,7 +100,7 @@ export default function NotesTab({
   return (
     <div>
       {activeLanguage && translation && (
-        <div className="mb-4 flex items-center justify-between rounded-xl border border-brand-200 bg-brand-50 px-4 py-2.5 text-sm text-brand-800">
+        <div className="mb-4 flex items-center justify-between rounded-lg border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm text-ink">
           <span>
             Viewing <strong>{activeLanguage}</strong> translation
           </span>
@@ -114,18 +114,18 @@ export default function NotesTab({
       )}
 
       {!editing && summary && (
-        <div className="mb-5 rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 to-fuchsia-50/50 p-5">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-brand-600">
+        <div className="mb-5 rounded-lg border border-primary/20 bg-primary/10 p-5">
+          <div className="font-display text-sm font-semibold text-ink">
             Summary
           </div>
-          <p className="mt-1.5 text-[15px] leading-7 text-slate-700">
+          <p className="mt-1.5 text-[15px] leading-7 text-ink">
             {summary}
           </p>
           {!activeLanguage && note.keyPoints && note.keyPoints.length > 0 && (
             <ul className="mt-3 space-y-1.5">
               {note.keyPoints.map((p, i) => (
-                <li key={i} className="flex gap-2 text-sm text-slate-600">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-400" />
+                <li key={i} className="flex gap-2 text-sm text-muted">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                   {p}
                 </li>
               ))}
@@ -176,7 +176,7 @@ export default function NotesTab({
         )}
       </div>
       {genError && (
-        <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+        <div className="mb-3 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">
           {genError}
         </div>
       )}
@@ -185,10 +185,10 @@ export default function NotesTab({
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          className="min-h-[32rem] w-full resize-y rounded-2xl border border-slate-300 p-5 font-mono text-[13px] leading-6 focus:border-brand-500 focus:outline-none"
+          className="min-h-[32rem] w-full resize-y rounded-md border border-border bg-surface-2 p-5 font-mono text-[13px] leading-6 text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
         />
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+        <div className="rounded-lg border border-border bg-surface p-6 sm:p-8">
           <Markdown>{markdown ?? ""}</Markdown>
         </div>
       )}
@@ -208,16 +208,16 @@ function EmptyState({
   onGenerate: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-      <Sparkles className="mx-auto text-brand-400" size={36} />
-      <div className="mt-3 font-bold text-slate-800">No AI notes yet</div>
-      <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-slate-500">
+    <div className="rounded-lg border border-dashed border-border bg-surface px-6 py-14 text-center">
+      <Sparkles className="mx-auto text-primary" size={36} />
+      <div className="mt-3 font-display font-bold text-ink">No AI notes yet</div>
+      <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted">
         {aiReady
           ? "Generate structured notes with an overview, sections and key takeaways from this note's content."
           : "Add ANTHROPIC_API_KEY to .env.local and restart the server to unlock AI note generation."}
       </p>
       {error && (
-        <div className="mx-auto mt-4 max-w-md rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+        <div className="mx-auto mt-4 max-w-md rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">
           {error}
         </div>
       )}

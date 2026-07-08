@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Plus } from "lucide-react";
 
 export interface FAQItem {
   q: string;
@@ -11,28 +11,29 @@ export interface FAQItem {
 export default function FAQList({ items }: { items: FAQItem[] }) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   return (
-    <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
-      {items.map((item, i) => (
-        <div key={i}>
-          <button
-            className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-            onClick={() => setOpenIdx(openIdx === i ? null : i)}
-          >
-            <span className="text-sm font-semibold text-slate-900 sm:text-[15px]">
-              {item.q}
-            </span>
-            <ChevronDown
-              size={18}
-              className={`shrink-0 text-slate-400 transition-transform ${openIdx === i ? "rotate-180" : ""}`}
-            />
-          </button>
-          {openIdx === i && (
-            <div className="px-5 pb-5 text-sm leading-6 text-slate-600">
-              {item.a}
-            </div>
-          )}
-        </div>
-      ))}
+    <div className="divide-y divide-border border-y border-border">
+      {items.map((item, i) => {
+        const open = openIdx === i;
+        return (
+          <div key={i}>
+            <button
+              className="flex w-full items-center justify-between gap-4 py-4 text-left"
+              onClick={() => setOpenIdx(open ? null : i)}
+            >
+              <span className="font-display text-[15px] font-semibold text-ink">
+                {item.q}
+              </span>
+              <Plus
+                size={18}
+                className={`shrink-0 text-muted transition-transform duration-300 ${open ? "rotate-45" : ""}`}
+              />
+            </button>
+            {open && (
+              <div className="pb-5 text-sm leading-7 text-muted">{item.a}</div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

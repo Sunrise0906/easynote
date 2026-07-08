@@ -4,7 +4,7 @@ import { GraduationCap, Heart, ShieldCheck, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Why we built EasyNote.",
+  description: "Why we built Recall.",
 };
 
 const VALUES = [
@@ -33,14 +33,14 @@ const VALUES = [
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <h1 className="text-center text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+      <h1 className="font-display text-center text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
         We take the notes.
         <br />
         You do the thinking.
       </h1>
-      <div className="mx-auto mt-8 max-w-2xl space-y-4 text-[15px] leading-7 text-slate-600">
+      <div className="mx-auto mt-8 max-w-2xl space-y-4 text-[15px] leading-7 text-muted">
         <p>
-          EasyNote started with a familiar frustration: after a ninety-minute
+          Recall started with a familiar frustration: after a ninety-minute
           lecture, the choice was between three pages of half-legible scribbles
           or two hours of re-watching the recording. Neither was learning —
           both were bookkeeping.
@@ -53,7 +53,7 @@ export default function AboutPage() {
           from the material itself.
         </p>
         <p>
-          Today EasyNote helps students prepare for exams, professionals keep
+          Today Recall helps students prepare for exams, professionals keep
           up with meetings and webinars, and lifelong learners turn a YouTube
           binge into something that sticks.
         </p>
@@ -63,28 +63,28 @@ export default function AboutPage() {
         {VALUES.map((v) => (
           <div
             key={v.title}
-            className="rounded-2xl border border-slate-200 bg-white p-6"
+            className="rounded-lg border border-border bg-surface p-6"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
               <v.icon size={20} />
             </div>
-            <div className="mt-3 font-bold text-slate-900">{v.title}</div>
-            <p className="mt-1.5 text-sm leading-6 text-slate-600">{v.desc}</p>
+            <div className="mt-3 font-display font-bold text-ink">{v.title}</div>
+            <p className="mt-1.5 text-sm leading-6 text-muted">{v.desc}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-14 rounded-3xl bg-brand-50 px-8 py-10 text-center">
-        <h2 className="text-2xl font-extrabold text-slate-900">
+      <div className="mt-14 rounded-xl border border-border bg-primary/10 px-8 py-10 text-center">
+        <h2 className="font-display text-2xl font-extrabold text-ink">
           Learn something today
         </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted">
           Bring one lecture, one meeting or one video — see what it feels like
           when the notes take themselves.
         </p>
         <Link
           href="/login?mode=signup"
-          className="mt-6 inline-block rounded-xl bg-brand-600 px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-700"
+          className="mt-6 inline-block rounded-md bg-primary px-7 py-3 text-sm font-bold text-primary-ink transition hover:opacity-90"
         >
           Get started free
         </Link>

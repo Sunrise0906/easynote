@@ -1,8 +1,8 @@
 {
-  "name": "easynote",
+  "name": "recall",
   "version": "1.0.0",
   "private": true,
-  "description": "EasyNote — AI note-taking assistant: turn audio, video, YouTube, PDFs and images into notes, flashcards, quizzes, mind maps and chat.",
+  "description": "Recall — AI note-taking: turn audio, video, YouTube, PDFs and images into notes, flashcards, quizzes, mind maps and chat, with four switchable themes.",
   "license": "MIT",
   "engines": {
     "node": ">=20"
