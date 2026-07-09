@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BadgeCheck, Crown, KeyRound, Server } from "lucide-react";
+import { BadgeCheck, Crown, KeyRound, Lock, Server } from "lucide-react";
 import { Button } from "../ui";
 import { apiGet, apiPost } from "@/lib/client";
 import { MeResponse } from "@/lib/types";
@@ -186,33 +186,46 @@ export default function SettingsView() {
           <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
             {capabilities.models.map((m) => {
               const active = capabilities.activeModel === m.id;
+              const locked = m.locked;
               return (
                 <button
                   key={m.id}
-                  onClick={() => !active && chooseModel(m.id)}
+                  onClick={() =>
+                    locked
+                      ? router.push("/price")
+                      : !active && chooseModel(m.id)
+                  }
                   disabled={busy === `model:${m.id}`}
-                  className={`rounded-lg border-2 p-4 text-left transition ${
+                  className={`relative rounded-lg border-2 p-4 text-left transition ${
                     active
                       ? "border-primary bg-primary/10"
-                      : "border-border hover:border-primary/50 hover:bg-surface-2"
+                      : locked
+                        ? "border-border opacity-70 hover:border-accent/50"
+                        : "border-border hover:border-primary/50 hover:bg-surface-2"
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-ink">
-                      {m.label}
-                    </span>
-                    {active && (
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-semibold text-ink">{m.label}</span>
+                    {active ? (
                       <span className="flex items-center gap-1 text-xs font-bold text-primary">
                         <BadgeCheck size={14} /> Active
                       </span>
-                    )}
+                    ) : locked ? (
+                      <span className="flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">
+                        <Lock size={11} /> Pro
+                      </span>
+                    ) : null}
                   </div>
-                  <p className="mt-1 text-xs leading-5 text-muted">
-                    {m.blurb}
-                  </p>
-                  <div className="mt-2 flex gap-1.5">
+                  <p className="mt-1 text-xs leading-5 text-muted">{m.blurb}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     <Tag>Text</Tag>
                     {m.vision ? <Tag>Vision</Tag> : <Tag muted>No image OCR</Tag>}
+                    {m.tier === "free" && <Tag muted>Free plan</Tag>}
+                    {locked && (
+                      <span className="text-[10px] font-semibold text-accent">
+                        Upgrade to use →
+                      </span>
+                    )}
                   </div>
                 </button>
               );

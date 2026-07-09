@@ -4,6 +4,7 @@ import { getNote, updateNote } from "@/lib/store";
 import { streamChatReply } from "@/lib/ai/chat";
 import { AiNotConfiguredError } from "@/lib/ai/client";
 import { RefusalError } from "@/lib/ai/provider";
+import { resolveModelForUser } from "@/lib/ai/models";
 import { aiConfigured } from "@/lib/config";
 import { canChat, releaseChat, reserveChat } from "@/lib/quota";
 
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     return jsonError(new AiNotConfiguredError().message, 503, "ai_not_configured");
   }
 
-  const stream = streamChatReply(note, history, user.modelId);
+  const stream = streamChatReply(note, history, resolveModelForUser(user)?.id);
   const userTs = Date.now();
   const encoder = new TextEncoder();
 

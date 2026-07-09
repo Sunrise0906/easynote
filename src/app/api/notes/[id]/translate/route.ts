@@ -3,6 +3,7 @@ import { jsonError, requireUser } from "@/lib/api";
 import { getNote, updateNote } from "@/lib/store";
 import { translateNote } from "@/lib/ai/generate";
 import { AiNotConfiguredError } from "@/lib/ai/client";
+import { resolveModelForUser } from "@/lib/ai/models";
 import { rateLimit } from "@/lib/ratelimit";
 
 type Params = { params: Promise<{ id: string }> };
@@ -54,7 +55,11 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   try {
-    const result = await translateNote(note, language, auth.user.modelId);
+    const result = await translateNote(
+      note,
+      language,
+      resolveModelForUser(auth.user)?.id
+    );
     const translation = {
       summary: result.summary,
       notesMarkdown: result.notesMarkdown,

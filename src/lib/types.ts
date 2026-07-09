@@ -106,6 +106,8 @@ export interface AiModelOption {
   label: string;
   blurb: string;
   vision: boolean;
+  tier: "free" | "pro";
+  locked: boolean;
 }
 
 export interface MeResponse {

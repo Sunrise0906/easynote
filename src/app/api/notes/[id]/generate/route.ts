@@ -7,6 +7,7 @@ import {
   generateQuiz,
 } from "@/lib/ai/generate";
 import { AiNotConfiguredError } from "@/lib/ai/client";
+import { resolveModelForUser } from "@/lib/ai/models";
 import { PLANS } from "@/lib/config";
 import { rateLimit } from "@/lib/ratelimit";
 
@@ -41,7 +42,8 @@ export async function POST(req: NextRequest, { params }: Params) {
   } | null;
   const kind = body?.kind;
   const plan = PLANS[auth.user.plan];
-  const modelId = auth.user.modelId;
+  // Plan-enforced model — a free user can never drive a Pro-only model.
+  const modelId = resolveModelForUser(auth.user)?.id;
 
   try {
     if (kind === "flashcards") {

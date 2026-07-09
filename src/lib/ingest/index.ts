@@ -14,6 +14,7 @@ import {
   extractFromPdfViaClaude,
   generateNoteContent,
 } from "../ai/generate";
+import { resolveModelForUser } from "../ai/models";
 import { extractPdfText, renderPdfPages } from "./pdf";
 
 /** Max pages OCR'd from a scanned PDF (bounds cost & time). */
@@ -136,7 +137,8 @@ export async function processNote(noteId: string): Promise<void> {
   const note = await getNote(noteId);
   if (!note) return;
   const owner = await getUserById(note.userId);
-  const modelId = owner?.modelId;
+  // Plan-enforced model for this note's owner.
+  const modelId = owner ? resolveModelForUser(owner)?.id : undefined;
 
   try {
     /* -------- stage 1: transcript ------------------------------ */

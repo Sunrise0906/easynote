@@ -22,7 +22,17 @@ export const config = {
    * AI_DEFAULT_MODEL picks the default when several are configured.
    */
   ai: {
+    // Default model for FREE users (must be a free-tier model).
     defaultModel: process.env.AI_DEFAULT_MODEL || "",
+    // Default model for PRO users (falls back to defaultModel).
+    proDefaultModel: process.env.AI_PRO_DEFAULT_MODEL || "",
+    // Model ids that require the Pro plan (comma-separated). Everything else
+    // is available to the free plan. Default: the paid models are Pro-only so
+    // free users can't drain the operator's paid API keys.
+    proModels: (process.env.AI_PRO_MODELS ?? "minimax-m3,glm-5.2")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
     keys: {
       zhipu: process.env.ZHIPU_API_KEY || "",
       minimax: process.env.MINIMAX_API_KEY || "",
