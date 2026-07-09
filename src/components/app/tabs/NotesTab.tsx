@@ -214,7 +214,7 @@ function EmptyState({
       <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted">
         {aiReady
           ? "Generate structured notes with an overview, sections and key takeaways from this note's content."
-          : "Add ANTHROPIC_API_KEY to .env.local and restart the server to unlock AI note generation."}
+          : "Configure an AI provider and restart to unlock AI note generation."}
       </p>
       {error && (
         <div className="mx-auto mt-4 max-w-md rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">

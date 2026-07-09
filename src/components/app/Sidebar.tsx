@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
+  Activity,
+  Brain,
   CircleAlert,
   Crown,
   FolderPlus,
@@ -30,11 +32,15 @@ export default function Sidebar() {
   const [newFolderOpen, setNewFolderOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [folderBusy, setFolderBusy] = useState(false);
+  const [dueCount, setDueCount] = useState(0);
 
   const refresh = useCallback(() => {
     apiGet<MeResponse>("/api/auth/me").then(setMe).catch(() => {});
     apiGet<{ folders: FolderData[] }>("/api/folders")
       .then((d) => setFolders(d.folders))
+      .catch(() => {});
+    apiGet<{ counts: { due: number } }>("/api/review")
+      .then((d) => setDueCount(d.counts.due))
       .catch(() => {});
   }, []);
 
@@ -100,6 +106,19 @@ export default function Sidebar() {
           label="All notes"
         />
         <SidebarLink
+          href="/review"
+          active={pathname === "/review"}
+          icon={<Brain size={17} />}
+          label="Review"
+          badge={dueCount > 0 ? dueCount : undefined}
+        />
+        <SidebarLink
+          href="/memory"
+          active={pathname === "/memory"}
+          icon={<Activity size={17} />}
+          label="Memory"
+        />
+        <SidebarLink
           href="/recording"
           active={pathname === "/recording"}
           icon={<Mic size={17} />}
@@ -158,7 +177,7 @@ export default function Sidebar() {
           >
             <CircleAlert size={15} className="mt-0.5 shrink-0" />
             <span>
-              <strong>AI is off.</strong> Add ANTHROPIC_API_KEY to enable
+              <strong>AI is off.</strong> Add an AI provider key to enable
               notes, flashcards & chat.
             </span>
           </Link>
@@ -290,11 +309,13 @@ function SidebarLink({
   active,
   icon,
   label,
+  badge,
 }: {
   href: string;
   active: boolean;
   icon: React.ReactNode;
   label: string;
+  badge?: number;
 }) {
   return (
     <Link
@@ -307,6 +328,11 @@ function SidebarLink({
     >
       {icon}
       <span className="truncate">{label}</span>
+      {badge !== undefined && (
+        <span className="ml-auto rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white">
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
     </Link>
   );
 }

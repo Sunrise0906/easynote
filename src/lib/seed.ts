@@ -1,7 +1,10 @@
+import crypto from "crypto";
 import fs from "fs";
 import fsp from "fs/promises";
 import { hashPassword } from "./auth";
 import { dataPath, Note, saveNote, saveUser, User } from "./store";
+import { CardState } from "./srs";
+import { dayKey } from "./utils";
 
 /**
  * Seeds a demo account with one fully populated note so the whole app can
@@ -153,8 +156,93 @@ export async function ensureDemoData(): Promise<void> {
     updatedAt: now - 1000 * 60 * 60 * 5,
   };
   await saveNote(note);
+  await seedReviews(user.id, note, now);
 
   await fsp.writeFile(flag, new Date().toISOString(), "utf8");
+}
+
+/** Pre-populate the demo user's spaced-repetition pool so Review & Memory
+ *  look alive: cards at varied schedules + two weeks of review history. */
+async function seedReviews(
+  userId: string,
+  note: Note,
+  now: number
+): Promise<void> {
+  const DAY = 86_400_000;
+  const cardId = (front: string) =>
+    crypto
+      .createHash("sha1")
+      .update(`${note.id}::${front.trim().toLowerCase().replace(/\s+/g, " ").slice(0, 300)}`)
+      .digest("base64url")
+      .slice(0, 16);
+
+  // profile cycle: mastered · forgetting-soon · fresh · new
+  const profiles: {
+    state: CardState;
+    stability: number;
+    difficulty: number;
+    lastAgoD: number | null;
+    dueInD: number;
+    reps: number;
+  }[] = [
+    { state: "review", stability: 34, difficulty: 4.5, lastAgoD: 6, dueInD: 26, reps: 5 },
+    { state: "review", stability: 2, difficulty: 7, lastAgoD: 12, dueInD: -2, reps: 3 },
+    { state: "review", stability: 9, difficulty: 5.5, lastAgoD: 2, dueInD: 6, reps: 3 },
+    { state: "new", stability: 0, difficulty: 0, lastAgoD: null, dueInD: 0, reps: 0 },
+    { state: "review", stability: 1.6, difficulty: 8, lastAgoD: 9, dueInD: -1, reps: 2 },
+  ];
+
+  const cards = (note.flashcards ?? []).map((fc, i) => {
+    const p = profiles[i % profiles.length];
+    return {
+      id: cardId(fc.front),
+      noteId: note.id,
+      noteTitle: note.title,
+      front: fc.front,
+      back: fc.back,
+      srs: {
+        stability: p.stability,
+        difficulty: p.difficulty,
+        due: now + p.dueInD * DAY,
+        lastReview: p.lastAgoD === null ? null : now - p.lastAgoD * DAY,
+        reps: p.reps,
+        lapses: p.state === "review" && p.stability < 3 ? 1 : 0,
+        state: p.state,
+      },
+      createdAt: now - 14 * DAY,
+    };
+  });
+
+  // ~2 weeks of activity (most days, varied counts) for the streak + chart
+  const history: { ts: number; cardId: string; grade: 1 | 2 | 3 | 4; day: string }[] = [];
+  const counts = [3, 5, 0, 4, 6, 2, 5, 0, 7, 3, 4, 5, 6, 4];
+  const anyCard = cards[0]?.id ?? "seed";
+  counts.forEach((c, idx) => {
+    const dayAgo = counts.length - 1 - idx;
+    const ts = now - dayAgo * DAY;
+    for (let k = 0; k < c; k++) {
+      history.push({
+        ts,
+        cardId: anyCard,
+        grade: (2 + (k % 3)) as 2 | 3 | 4,
+        day: dayKey(ts),
+      });
+    }
+  });
+
+  const store = {
+    cards,
+    history,
+    lastReviewDay: dayKey(now - DAY),
+    streak: 6,
+  };
+  const dir = dataPath("reviews");
+  await fsp.mkdir(dir, { recursive: true });
+  await fsp.writeFile(
+    dataPath("reviews", `${userId}.json`),
+    JSON.stringify(store, null, 2),
+    "utf8"
+  );
 }
 
 const DEMO_TRANSCRIPT = [

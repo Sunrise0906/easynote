@@ -109,7 +109,7 @@ export default function ChatTab({
           Chat with this note
         </div>
         <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted">
-          Add ANTHROPIC_API_KEY to .env.local and restart the server to ask
+          Configure an AI provider and restart to ask
           questions about this material.
         </p>
       </div>

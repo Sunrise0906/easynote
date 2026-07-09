@@ -138,6 +138,73 @@ export interface MeResponse {
   };
 }
 
+export interface ReviewQueueCard {
+  id: string;
+  noteId: string;
+  noteTitle: string;
+  front: string;
+  back: string;
+  state: {
+    stability: number;
+    difficulty: number;
+    due: number;
+    lastReview: number | null;
+    reps: number;
+    lapses: number;
+    state: "new" | "learning" | "review" | "relearning";
+  };
+}
+
+export interface ReviewQueueResponse {
+  queue: ReviewQueueCard[];
+  counts: { due: number; dueToday: number; total: number; new: number };
+  streak: number;
+}
+
+export interface MemoryStatsData {
+  totalCards: number;
+  reviewedCards: number;
+  newCards: number;
+  dueNow: number;
+  dueToday: number;
+  streak: number;
+  retention: number;
+  notes: {
+    noteId: string;
+    title: string;
+    total: number;
+    due: number;
+    mastery: number;
+  }[];
+  forgettingSoon: {
+    id: string;
+    noteId: string;
+    noteTitle: string;
+    front: string;
+    retrievability: number;
+  }[];
+  activity: { day: string; count: number }[];
+}
+
+export interface FeynmanEvaluation {
+  overall: number;
+  summary: string;
+  accuracy: number;
+  completeness: number;
+  covered: string[];
+  missed: string[];
+  errors: string[];
+  presentation: {
+    clarity: number;
+    structure: number;
+    conciseness: number;
+    fillerWords: string[];
+    pace: string;
+    tips: string[];
+  };
+  nextStep: string;
+}
+
 export const SOURCE_LABEL: Record<SourceType, string> = {
   youtube: "YouTube",
   audio: "Audio",

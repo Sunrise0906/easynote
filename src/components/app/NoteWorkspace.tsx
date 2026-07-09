@@ -20,6 +20,7 @@ import {
   MoreHorizontal,
   Network,
   Pencil,
+  Presentation,
   ScrollText,
   Share2,
   Trash2,
@@ -32,6 +33,7 @@ import FlashcardsTab from "./tabs/FlashcardsTab";
 import QuizTab from "./tabs/QuizTab";
 import ChatTab from "./tabs/ChatTab";
 import MindmapTab from "./tabs/MindmapTab";
+import FeynmanTab from "./tabs/FeynmanTab";
 import { Button, Field, Modal, inputClass } from "../ui";
 import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/client";
 import { SUPPORTED_LANGUAGES } from "@/lib/languages";
@@ -42,6 +44,7 @@ type TabKey =
   | "transcript"
   | "flashcards"
   | "quiz"
+  | "feynman"
   | "chat"
   | "mindmap";
 
@@ -50,6 +53,7 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
   { key: "transcript", label: "Transcript", icon: ScrollText },
   { key: "flashcards", label: "Flashcards", icon: Brain },
   { key: "quiz", label: "Quiz", icon: ListChecks },
+  { key: "feynman", label: "Teach-back", icon: Presentation },
   { key: "chat", label: "Chat", icon: MessageCircleQuestion },
   { key: "mindmap", label: "Mind map", icon: Network },
 ];
@@ -535,6 +539,9 @@ export default function NoteWorkspace({ noteId }: { noteId: string }) {
             )}
             {tab === "quiz" && (
               <QuizTab note={note} onNoteChange={setNote} aiReady={aiReady} />
+            )}
+            {tab === "feynman" && (
+              <FeynmanTab note={note} aiReady={aiReady} />
             )}
             {tab === "chat" && (
               <ChatTab

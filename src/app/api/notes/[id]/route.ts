@@ -60,5 +60,7 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     return jsonError("Note not found.", 404);
   }
   await deleteNote(id);
+  const { removeNoteCards } = await import("@/lib/reviews");
+  await removeNoteCards(auth.user.id, id);
   return NextResponse.json({ ok: true });
 }

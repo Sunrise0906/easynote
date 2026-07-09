@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  Activity,
   ArrowUpRight,
   AudioLines,
   Brain,
@@ -12,6 +13,8 @@ import {
   Network,
   NotebookPen,
   PlayCircle,
+  Presentation,
+  Repeat,
 } from "lucide-react";
 import PricingSection from "@/components/marketing/PricingSection";
 import FAQList from "@/components/marketing/FAQList";
@@ -265,8 +268,62 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---------------- STUDY TOOLS (alternating rows) ---------------- */}
+      {/* ---------------- THE WEDGE: memory system ---------------- */}
       <section className="border-y border-border bg-surface py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+              <Brain size={13} /> Why it&apos;s called Recall
+            </div>
+            <h2 className="font-display mt-4 text-3xl font-bold text-ink sm:text-4xl">
+              Other apps stop at notes.
+              <br />
+              Recall makes it stick.
+            </h2>
+            <p className="mt-3 leading-7 text-muted">
+              Generating flashcards is the easy part — everyone does it. Recall
+              owns the part that actually builds memory: it schedules your
+              reviews, shows you what you&apos;re forgetting, and makes you prove
+              you understand by teaching it back.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                icon: Repeat,
+                title: "Spaced repetition, automatic",
+                body: "Every flashcard across all your notes enters one daily queue, scheduled by FSRS — the same algorithm Anki uses — to resurface each card right before you'd forget it.",
+              },
+              {
+                icon: Activity,
+                title: "A memory dashboard",
+                body: "See your true retention, which notes are mastered, and exactly what's slipping — a live map of what's in your head, not just what you saved.",
+              },
+              {
+                icon: Presentation,
+                title: "Teach-back (Feynman mode)",
+                body: "Explain a topic out loud. Recall grades your understanding against the source AND coaches your delivery — structure, clarity, filler words. Learn it and present it.",
+              },
+            ].map((f) => (
+              <div
+                key={f.title}
+                className="rounded-lg border border-border bg-bg p-6"
+              >
+                <div className="flex h-11 w-11 items-center justify-center rounded-md bg-primary/10 text-primary">
+                  <f.icon size={22} />
+                </div>
+                <h3 className="font-display mt-4 text-lg font-semibold text-ink">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-muted">{f.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- STUDY TOOLS (alternating rows) ---------------- */}
+      <section className="py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="font-display max-w-2xl text-3xl font-bold text-ink sm:text-4xl">
             A whole study toolkit, made for you

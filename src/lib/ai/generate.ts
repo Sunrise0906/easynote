@@ -269,6 +269,130 @@ ${truncateChars(note.notesMarkdown ?? "", MATERIAL_BUDGET)}`;
 }
 
 /* ------------------------------------------------------------------ */
+/* Feynman mode: grade a spoken explanation (content + presentation)   */
+/* ------------------------------------------------------------------ */
+
+export interface FeynmanEval {
+  overall: number;
+  summary: string;
+  accuracy: number;
+  completeness: number;
+  covered: string[];
+  missed: string[];
+  errors: string[];
+  presentation: {
+    clarity: number;
+    structure: number;
+    conciseness: number;
+    fillerWords: string[];
+    pace: string;
+    tips: string[];
+  };
+  nextStep: string;
+}
+
+const FEYNMAN_SCHEMA = {
+  type: "object",
+  properties: {
+    overall: { type: "integer", description: "0-100 overall mastery score." },
+    summary: { type: "string", description: "2-3 sentence encouraging verdict." },
+    accuracy: { type: "integer", description: "0-100: correctness vs source." },
+    completeness: {
+      type: "integer",
+      description: "0-100: how much of the key material was covered.",
+    },
+    covered: {
+      type: "array",
+      items: { type: "string" },
+      description: "Key points the learner explained well.",
+    },
+    missed: {
+      type: "array",
+      items: { type: "string" },
+      description: "Important points from the source they left out.",
+    },
+    errors: {
+      type: "array",
+      items: { type: "string" },
+      description: "Things they said that are wrong, imprecise, or misleading.",
+    },
+    presentation: {
+      type: "object",
+      properties: {
+        clarity: { type: "integer" },
+        structure: { type: "integer" },
+        conciseness: { type: "integer" },
+        fillerWords: {
+          type: "array",
+          items: { type: "string" },
+          description: "Filler words/verbal tics noticed (e.g. 'um', 'like', 'basically'), with counts if notable.",
+        },
+        pace: { type: "string", description: "Brief note on pacing/length." },
+        tips: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-3 concrete presentation/delivery tips.",
+        },
+      },
+      required: ["clarity", "structure", "conciseness", "fillerWords", "pace", "tips"],
+      additionalProperties: false,
+    },
+    nextStep: {
+      type: "string",
+      description: "One concrete thing to do next to improve.",
+    },
+  },
+  required: [
+    "overall",
+    "summary",
+    "accuracy",
+    "completeness",
+    "covered",
+    "missed",
+    "errors",
+    "presentation",
+    "nextStep",
+  ],
+  additionalProperties: false,
+} as const;
+
+export async function evaluateFeynman(
+  note: Note,
+  explanation: string,
+  topic: string,
+  meta: { durationSec?: number; wordCount?: number },
+  modelId?: string | null
+): Promise<FeynmanEval> {
+  const system = `You are a sharp, encouraging tutor AND a presentation coach. A learner is using the Feynman technique — explaining a topic out loud in their own words to prove they understand it. You have the SOURCE MATERIAL (ground truth) and a transcript of what they said.
+
+Judge on two axes:
+1) CONTENT — accuracy (is what they said correct per the source?), completeness (did they cover the important points?), covered (what they nailed), missed (key source points they skipped), errors (wrong or imprecise claims).
+2) PRESENTATION / communication skill — clarity, logical structure (did they build up the idea in a sensible order?), conciseness (rambling vs tight), filler words / verbal tics, and pacing. Give 2-3 concrete delivery tips.
+
+Be specific and reference the material. Be honest with scores (don't inflate) but constructive. Score 0-100. Write in the language the learner used.`;
+
+  const wordInfo = meta.wordCount ? `${meta.wordCount} words` : "";
+  const timeInfo = meta.durationSec
+    ? `${Math.round(meta.durationSec)}s spoken`
+    : "";
+  const user = `TOPIC: ${topic}
+
+=== SOURCE MATERIAL (ground truth) ===
+${truncateChars(note.notesMarkdown || transcriptFullText(note), 40_000)}
+
+=== LEARNER'S SPOKEN EXPLANATION ${[wordInfo, timeInfo].filter(Boolean).join(", ")} ===
+${explanation}`;
+
+  return generateJSON<FeynmanEval>({
+    system,
+    user,
+    schema: FEYNMAN_SCHEMA as unknown as Record<string, unknown>,
+    maxTokens: 4000,
+    modelId,
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Vision: extract text/content from an image                          */
 /* ------------------------------------------------------------------ */
 

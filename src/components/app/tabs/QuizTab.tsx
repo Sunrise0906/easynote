@@ -64,7 +64,7 @@ export default function QuizTab({
         <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted">
           {aiReady
             ? "Multiple-choice questions with explanations, generated from this note."
-            : "Add ANTHROPIC_API_KEY to .env.local to unlock quiz generation."}
+            : "Configure an AI provider to unlock quiz generation."}
         </p>
         {error && (
           <div className="mx-auto mt-4 max-w-md rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-600">

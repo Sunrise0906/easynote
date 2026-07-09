@@ -233,7 +233,7 @@ export default function SettingsView() {
           </div>
         ) : (
           <div className="mt-4 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm text-ink">
-            No AI model is configured. Set <code>ANTHROPIC_API_KEY</code>,{" "}
+            No AI model is configured. Set <code>ZHIPU_API_KEY</code>,{" "}
             <code>ZHIPU_API_KEY</code> or <code>MINIMAX_API_KEY</code> (or an{" "}
             <code>AI_BASE_URL</code> provider) and restart the server.
           </div>
