@@ -65,7 +65,20 @@ export const config = {
     cookieName: "en_session",
     maxAgeDays: 30,
   },
+
+  /**
+   * Super users (comma-separated emails) get permanent Pro + every model
+   * unlocked, defaulting to MiniMax — for the operator's own testing.
+   */
+  superUsers: (process.env.SUPER_USERS || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean),
 };
+
+export function isSuperUser(email: string): boolean {
+  return config.superUsers.includes(email.trim().toLowerCase());
+}
 
 /** Public base URL of this deployment (used for SEO metadata + share links). */
 export function appUrl(): string {

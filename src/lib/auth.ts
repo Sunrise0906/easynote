@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { promisify } from "util";
 import { cookies } from "next/headers";
-import { config } from "./config";
+import { config, isSuperUser } from "./config";
 import {
   User,
   createSession,
@@ -10,6 +10,7 @@ import {
   getSession,
   getUserByEmail,
   getUserById,
+  updateUser,
 } from "./store";
 import { newId, newToken } from "./utils";
 
@@ -88,7 +89,17 @@ export async function currentUser(): Promise<User | null> {
   if (!token) return null;
   const session = await getSession(token);
   if (!session) return null;
-  return getUserById(session.userId);
+  const user = await getUserById(session.userId);
+  if (!user) return null;
+  // Super users get permanent Pro + MiniMax by default (one-time upgrade).
+  if (isSuperUser(user.email) && (user.plan !== "pro" || !user.modelId)) {
+    const upgraded = await updateUser(user.id, (u) => {
+      u.plan = "pro";
+      if (!u.modelId) u.modelId = "minimax-m3";
+    });
+    return upgraded ?? user;
+  }
+  return user;
 }
 
 /* ---------------- account creation --------------------------------- */
